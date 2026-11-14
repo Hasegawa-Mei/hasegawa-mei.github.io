@@ -1,4 +1,4 @@
-import {runQueue,downloadWithRetry,progressRatio} from './preload-core.js';
+import {runQueue,downloadWithRetry,progressRatio} from './preload-core.js?v=github-2';
 import {rememberBytes,prepareImage} from './resource-cache.js';
 
 const root=document.documentElement,screen=document.getElementById('site-preloader');
@@ -11,7 +11,7 @@ function paint(){
 }
 function changed(){if(!frame)frame=requestAnimationFrame(paint);}
 async function plan(){
- if(!assets.length){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);try{const response=await fetch('./preload-manifest.json',{cache:'no-cache',signal:controller.signal});if(!response.ok)throw Error('Manifest unavailable');({assets}=await response.json());}finally{clearTimeout(timer);}}
+ if(!assets.length){const embedded=document.getElementById('preload-assets');if(embedded){({assets}=JSON.parse(embedded.textContent));return;}const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),60000);try{const response=await fetch('./preload-manifest.json',{cache:'no-cache',signal:controller.signal});if(!response.ok)throw Error('Manifest unavailable');({assets}=await response.json());}finally{clearTimeout(timer);}}
 }
 async function prepare(){
  if(!tasks.length){

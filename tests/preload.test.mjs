@@ -38,4 +38,8 @@ test('manifest covers the four scores, film, all study models and hand runtime',
  for(const url of expected)assert.ok(assets.some(x=>x.url===url),url);
  assert.equal(new Set(assets.map(x=>x.url)).size,assets.length);
  for(const asset of assets)assert.equal((await stat(new URL('../docs/'+asset.url.slice(2),import.meta.url))).size,asset.size,asset.url);
+ const index=await readFile(new URL('../docs/index.html',import.meta.url),'utf8');
+ const embedded=index.match(/<script id="preload-assets" type="application\/json">([\s\S]*?)<\/script>/);
+ assert.ok(embedded,'the first load must not depend on a separate manifest request');
+ assert.deepEqual(JSON.parse(embedded[1]).assets,assets);
 });
