@@ -15,12 +15,23 @@ html=html.replace(/<link rel="stylesheet"[^>]+>/g,'');
 const style=Object.keys(css.metafile.outputs).find(f=>f.endsWith('.css'));
 html=html.replace('</head>','<link rel="stylesheet" href="'+path.basename(style)+'"></head>');
 const entry=Object.entries(result.metafile.outputs).find(([,v])=>v.entryPoint?.endsWith('site-entry.js'))[0];
+const reader=Object.entries(result.metafile.outputs).find(([,v])=>v.entryPoint?.endsWith('dialogue.js'))[0];
+const initialModules=new Set();
+function visit(file){if(initialModules.has(file))return;initialModules.add(file);for(const dependency of result.metafile.outputs[file]?.imports||[])if(dependency.kind==='import-statement'&&!dependency.external)visit(dependency.path);}
+visit(entry);visit(reader);
+html=html.replace(/<link rel="modulepreload"[^>]*>/g,'');
+html=html.replace('</head>',[...initialModules].map(file=>'<link rel="modulepreload" href="'+path.basename(file)+'">').join('')+'</head>');
 html=html.replace(/<script type="module" src="orientation\.js"><\/script>/,'');
-html=html.replace(/<script type="module" src="(?:boot\.js[^\"]*|built-app-[^\"]+)"[^>]*><\/script>/,'<script type="module" src="'+path.basename(entry)+'"></script>');
+// Inline onerror handlers can contain an arrow (=>). A [^>]* tag matcher
+// stopped at that arrow and silently left the legacy boot script in place.
+html=html.replace(/<script type="module" src="(?:boot\.js[^\"]*|built-app-[^\"]+)"[\s\S]*?<\/script>/,'<script type="module" src="'+path.basename(entry)+'"></script>');
+const moduleTags=[...html.matchAll(/<script\b[^]*?<\/script>/g)].map(m=>m[0]).filter(tag=>/^<script type="module"/.test(tag));
+if(moduleTags.length!==1||!moduleTags[0].includes('src="'+path.basename(entry)+'"'))throw Error('The HTML must load exactly the newly generated app entry');
 html=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'');
 html=html.replace(/<script id="boot-watchdog">[\s\S]*?<\/script>/,'');
 const watchdog=`<script id="boot-watchdog">window.__bootWatchdog=setTimeout(()=>{const box=document.getElementById('preload-error');if(!box)return;box.hidden=false;document.getElementById('preload-message').textContent='页面连接较慢，请稍候或重试。';},10000);document.getElementById('preload-retry').onclick=()=>location.reload();</script>`;
 html=html.replace('</body>',watchdog+'</body>');
 await writeFile(path.join(root,'index.html'),html);
+await writeFile(path.join(root,'runtime-manifest.json'),JSON.stringify({entry:path.basename(entry),style:path.basename(style),initialModules:[...initialModules].map(file=>({file:path.basename(file),bytes:result.metafile.outputs[file].bytes})),deferred:Object.entries(result.metafile.outputs).filter(([file])=>!initialModules.has(file)).map(([file])=>path.basename(file))}));
 await import('./preload-manifest.mjs');
 console.log(JSON.stringify({entry:path.basename(entry),style:path.basename(style),bundles:Object.keys(result.metafile.outputs).length}));

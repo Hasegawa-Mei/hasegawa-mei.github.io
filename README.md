@@ -14,4 +14,6 @@ Local preview: `node scripts/preview.mjs`. Its `/__slow/` route delays media for
 
 Run checks with `node --test tests/*.test.mjs`.
 
+Run `node scripts/check-runtime.mjs` to evaluate the exact module referenced by the published HTML in a simulated DOM and confirm it reaches the cover. This supplements browser testing; it does not verify WebGL rendering. The build also checks the HTML entry and preloads its static dependency graph. Decorative identity lettering is loaded only when a card needs it.
+
 Third-party libraries retain their license notices in `docs/vendor/` and `docs/fonts/`.
