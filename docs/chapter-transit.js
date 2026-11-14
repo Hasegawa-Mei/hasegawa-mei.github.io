@@ -1,3 +1,4 @@
+import {settleWithin} from './load-budget.js';
 import {assetBytes} from './resource-cache.js';
 import {setMusic,preloadMusic,musicEnabled} from './music.js';
 import {traceSort} from './unit-entrance.js';
@@ -126,7 +127,7 @@ export function prepareEpilogue(){
   unlockBell();
   preloadMusic('finale');preloadMusic('endgame');
   return preparation??=Promise.allSettled([
-    ...['epilogue/bell-body.png','epilogue/bell-clapper.png','standby/cobalt.webp','standby/paper.webp','standby/graphite.webp','standby/silver.webp','standby/birds.webp','standby/yours-to-open.svg'].map(file=>{
+    ...['epilogue/bell-body.webp','epilogue/bell-clapper.webp','standby/cobalt.webp','standby/paper.webp','standby/graphite.webp','standby/silver.webp','standby/birds.webp','standby/yours-to-open.svg'].map(file=>{
       const img=new Image();img.src='./assets/'+file;return img.decode();
     }),
     assetBytes('./assets/epilogue/bell.wav').then(bytes=>{soundBytes=bytes;return decodeBell()})
@@ -142,11 +143,11 @@ function strikeBell(){
   return()=>{try{source.stop()}catch{}};
 }
 export async function enterEpilogue(swap){
-  await prepareEpilogue();
+  await settleWithin(prepareEpilogue(),5000);
   const rects=routes('.poster-lugs'),opened=document.body.classList.contains('unit-open');
   setMusic('silence',{out:1});
   const host=layer('epilogue-path-turn'),m=motionScope(host);
-  host.innerHTML='<div class="epilogue-paper"></div><div class="epilogue-center"><div class="bell-underprint"></div><i class="bell-wave wave-one"></i><i class="bell-wave wave-two"></i><svg class="bell-light-star" viewBox="-100 -100 200 200"><path d="M0-100C2-15 4-4 100 0C15 2 4 4 0 100C-2 15-4 4-100 0C-15-2-4-4 0-100Z"/></svg><div class="bell-reveal"><div class="bell-pendulum"><img class="bell-clapper" src="./assets/epilogue/bell-clapper.png" alt=""><img class="bell-body" src="./assets/epilogue/bell-body.png" alt=""></div></div><i class="bell-pin-light"></i></div><i class="bell-cut-flash"></i>';
+  host.innerHTML='<div class="epilogue-paper"></div><div class="epilogue-center"><div class="bell-underprint"></div><i class="bell-wave wave-one"></i><i class="bell-wave wave-two"></i><svg class="bell-light-star" viewBox="-100 -100 200 200"><path d="M0-100C2-15 4-4 100 0C15 2 4 4 0 100C-2 15-4 4-100 0C-15-2-4-4 0-100Z"/></svg><div class="bell-reveal"><div class="bell-pendulum"><img class="bell-clapper" src="./assets/epilogue/bell-clapper.webp" alt=""><img class="bell-body" src="./assets/epilogue/bell-body.webp" alt=""></div></div><i class="bell-pin-light"></i></div><i class="bell-cut-flash"></i>';
   const find=s=>host.querySelector(s);
   let stopSound=()=>{};
   try{

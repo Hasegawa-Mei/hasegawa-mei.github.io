@@ -1,3 +1,5 @@
+import {settleWithin} from './load-budget.js';
+import {warmStage} from './loading-policy.js';
 import {setMusic} from './music.js';
 import {proposals,withProposalLayer,proposalAt,proposalAction,proposalStatus} from './proposal-content.js';
 import {proposalReading,renderProposalControls,proposalPrimaryAction} from './proposal-view.js';
@@ -250,10 +252,10 @@ async function go(index,instant=false,fromAddress=false){
   if(inspect)setInspect(false);
   try{
     const finaleModule=next===finaleIndex?await import('./finale.js'):null;
-    const assets=prepareStudy(studies[next]?.id);
-    if(openingMotion!=='fade'&&openingMotion!=='assemble')await assets;
+    const assets=settleWithin(prepareStudy(studies[next]?.id),6000);
+    if(openingMotion!=='fade'&&openingMotion!=='assemble')await settleWithin(assets,6000);
     await turnSheet(direction,!instant&&!reduce,async()=>{
-      if(openingMotion)await assets;
+      if(openingMotion)await settleWithin(assets,6000);
       if(next===finaleIndex){
         leavePrologue();finale=finaleModule;
         clearTimeout(layerTimer);layerBusy=false;renderer?.setAnimationLoop(null);
@@ -268,6 +270,7 @@ async function go(index,instant=false,fromAddress=false){
           document.body.classList.remove('in-finale');
         }
         readerReady=true;activate(next);
+        warmStage(next<0?'prologue':next>=studies.length-2?'finale':'chapters');
         // Draw the arriving model before the browser captures the new sheet.
         if(!isOpening(next)&&next!==-.5&&renderer&&lens)frame(performance.now());
       }

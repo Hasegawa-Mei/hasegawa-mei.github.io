@@ -5,7 +5,7 @@ import {faces} from './reading-round.js';
 import {identityPortraits} from './identity-card.js';
 import {prologueMedia} from './prologue-media.js';
 
-let musicStartAt=0,waitingForMusic=false;
+let musicStartAt=0,waitingForMusic=false,stalledFor=0,lastVideoTime=-1;
 let host,renderer,scene,camera,tower,portraits=[],keyLight,beam,star,halos,clock=0,last=0,raf=0,active=false,paused=false,done,segment=-1,total=0,segments=[],videoErrored=false;
 const $=id=>document.getElementById(id),reduce=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -59,7 +59,7 @@ function playVideo(){
 function setSegment(){
  const index=segments.findIndex(s=>clock>=s.start&&clock<s.end);
  if(index===segment||index<0)return;
- segment=index;const s=segments[index],v=$('prologue-video');videoErrored=false;v.pause();v.hidden=true;
+ segment=index;const s=segments[index],v=$('prologue-video');videoErrored=false;stalledFor=0;lastVideoTime=-1;v.pause();v.hidden=true;
  $('prologue-cn').textContent=s.kind==='portrait'?s.cn:'';
  $('prologue-en').textContent=s.kind==='portrait'?s.en:'';
  $('prologue-role').textContent=s.kind==='portrait'?s.face.concept:'';
@@ -71,10 +71,16 @@ function setSegment(){
 const smooth=value=>{const t=Math.max(0,Math.min(1,value));return t*t*(3-2*t);};
 function frame(now){
  if(!active)return;
- const dt=Math.min(.08,(now-last)/1000||0);last=now;
+ const wallDelta=Math.max(0,(now-last)/1000||0),dt=Math.min(.08,wallDelta);last=now;
  if(waitingForMusic&&now>=musicStartAt){waitingForMusic=false;if(!paused&&!$('prologue-video').hidden)playVideo();}
  if(!paused&&!waitingForMusic){const s=segments[segment],v=$('prologue-video');
-  if(s?.kind==='video'&&!videoErrored){if(v.ended)clock=s.end;else if(v.readyState>=2&&!v.seeking)clock=s.start+Math.min(s.duration,v.currentTime);}
+  if(s?.kind==='video'&&!videoErrored){
+   if(v.ended)clock=s.end;
+   else if(v.readyState>=2&&!v.seeking)clock=s.start+Math.min(s.duration,v.currentTime);
+   stalledFor=v.currentTime>lastVideoTime+.01?0:stalledFor+wallDelta;lastVideoTime=v.currentTime;
+   // An unavailable stream cannot trap the visitor on a black frame.
+   if(stalledFor>12){v.pause();videoErrored=true;clock=s.end;}
+  }
   else clock+=dt;
  }
  if(clock>=total){finish();return;}

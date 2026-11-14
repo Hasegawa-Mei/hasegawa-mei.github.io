@@ -11,7 +11,7 @@ function picture(url){if(!imageCache.has(url)){const img=new Image();img.src=url
 async function cardMap(id){
  if(cardMaps.has(id))return cardMaps.get(id);
  const promise=(async()=>{
-  const [stock,portrait]=await Promise.all([picture('./assets/identity/front-stock.png'),picture(identityPortraits[id])]);
+  const [stock,portrait]=await Promise.all([picture('./assets/identity/front-stock.webp'),picture(identityPortraits[id])]);
   const canvas=document.createElement('canvas');canvas.width=1120;canvas.height=1520;
   const c=canvas.getContext('2d'),x=160,y=180,w=800,h=1200;
   c.drawImage(stock,x,y,w,h);c.save();c.beginPath();

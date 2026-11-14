@@ -1,16 +1,17 @@
+import {settleWithin} from './load-budget.js';
 import {faces} from './reading-round.js';
 import {identityLettering} from './identity-lettering.js';
 const root='./assets/identity/';
 // Approved B direction: bright white sculptural half portraits.
-export const identityPortraits=Object.fromEntries(faces.map(face=>[face.id,'./assets/identity-studies/b-'+face.id+(face.id==='witness'?'-v2':'')+'.png']));
-const asset=id=>identityPortraits[id]||root+id+'.png';
+export const identityPortraits=Object.fromEntries(faces.map(face=>[face.id,'./assets/identity-studies/b-'+face.id+(face.id==='witness'?'-v2':'')+'.webp']));
+const asset=id=>identityPortraits[id]||root+id+'.webp';
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cache=new Map(),embedded=new Map();
 export function prepareCardFace(face){
   const files=['back','front-stock'];
   if(face&&faces.some(f=>f.id===face.id))files.push(face.id);
   return Promise.all(files.map(file=>{
-    if(!cache.has(file)){const img=new Image();img.src=asset(file);cache.set(file,img.decode().then(()=>img).catch(()=>null))}
+    if(!cache.has(file)){const img=new Image();img.src=asset(file);cache.set(file,settleWithin(img.decode().then(()=>img),4000))}
     return cache.get(file);
   }));
 }

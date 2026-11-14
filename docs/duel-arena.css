@@ -31,7 +31,7 @@
 #duel-definition{font-size:14px;line-height:1.8;color:#435676;margin:0;min-height:36px;max-width:390px}
 .arena-deck-action .duel-primary{padding:12px 21px;min-width:105px;white-space:nowrap;font-size:14px;gap:18px;flex-shrink:0}
 .arena-hand{display:flex;align-items:flex-end;justify-content:center;height:clamp(155px,22vh,245px);padding:15px 0 0;isolation:isolate}
-#duel .arena-concept{pointer-events:auto;flex:0 0 clamp(112px,11vw,170px);height:clamp(168px,16.5vw,255px);position:relative;margin-left:-35px;padding:0;border:0;background:url('./assets/identity/front-stock.png') center/100% 100% no-repeat;color:#233d81;transform-origin:50% 120%;transform:translateY(calc(32px + var(--lift))) rotate(var(--angle));transition:transform .35s cubic-bezier(.2,.8,.2,1),filter .35s;filter:drop-shadow(0 5px 8px #1c315a24);text-align:center;border-radius:5px}
+#duel .arena-concept{pointer-events:auto;flex:0 0 clamp(112px,11vw,170px);height:clamp(168px,16.5vw,255px);position:relative;margin-left:-35px;padding:0;border:0;background:url('./assets/identity/front-stock.webp') center/100% 100% no-repeat;color:#233d81;transform-origin:50% 120%;transform:translateY(calc(32px + var(--lift))) rotate(var(--angle));transition:transform .35s cubic-bezier(.2,.8,.2,1),filter .35s;filter:drop-shadow(0 5px 8px #1c315a24);text-align:center;border-radius:5px}
 #duel .arena-concept:first-child{margin-left:0}
 #duel .arena-concept small{position:absolute;top:36%;left:15%;width:70%;font:400 14px/1.7 Arial;letter-spacing:.08em;color:#7082a5}
 #duel .arena-concept strong{position:absolute;left:14%;top:47%;width:72%;font:500 clamp(15px,1.35vw,21px)/1.5 'STZhongsong','SimSun',serif;letter-spacing:.05em}

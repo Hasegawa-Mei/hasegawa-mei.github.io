@@ -6,7 +6,11 @@ This is the independent GitHub Pages edition. The existing ChatGPT Site remains 
 
 Publish the `docs/` directory from the `main` branch with GitHub Pages.
 
-Regenerate the loading manifest after changing assets: `node scripts/preload-manifest.mjs`.
+After changing source or assets, install the locked development dependencies with pnpm and run `node scripts/build.mjs`. This generates hashed JavaScript/CSS bundles and embeds the loading manifest. Commit the generated files in `docs/` along with the source.
+
+Opening preparation is limited to the cover (about 1.2 MB of images), with a 4.5-second optional-media budget. Later media is prefetched by stage, and hand tracking loads only when selected. The original PNGs are retained alongside the smaller WebP copies. The image optimization helper requires Python and Pillow.
+
+Local preview: `node scripts/preview.mjs`. Its `/__slow/` route delays media for testing; it is not part of the published site.
 
 Run checks with `node --test tests/*.test.mjs`.
 

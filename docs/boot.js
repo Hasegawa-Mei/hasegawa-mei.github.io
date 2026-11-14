@@ -1,57 +1,52 @@
-import {runQueue,downloadWithRetry,progressRatio} from './preload-core.js?v=github-2';
-import {rememberBytes,prepareImage} from './resource-cache.js';
-
+import {runQueue,downloadWithRetry} from './preload-core.js';
+import {configurePreload,assetStage} from './loading-policy.js';
+import {settleWithin} from './load-budget.js';
 const root=document.documentElement,screen=document.getElementById('site-preloader');
-const bar=screen.querySelector('[role="progressbar"]'),fill=bar.firstElementChild,errorBox=document.getElementById('preload-error');
-const loaded=new Map(),complete=new Set(),prepared=new Set();let assets=[],tasks=[],app,busy=false,frame=0,started=false;
-const waitFrame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
-function paint(){
- frame=0;const value=progressRatio(assets,loaded,prepared.size,tasks.length,started),percent=Math.round(value*100);
- fill.style.transform='scaleX('+value+')';bar.setAttribute('aria-valuenow',percent);screen.dataset.progress=percent;
+const bar=screen.querySelector('[role="progressbar"]'),fill=bar.firstElementChild;
+const errorBox=document.getElementById('preload-error'),message=document.getElementById('preload-message');
+const skip=document.getElementById('preload-continue');
+let entering=null,finished=false,moduleReady=false;
+const optional=new AbortController(),loaded=new Map();
+const assets=JSON.parse(document.getElementById('preload-assets').textContent).assets;
+const critical=assets.filter(a=>assetStage(a.url)==='cover');
+configurePreload(assets);
+const total=critical.reduce((n,a)=>n+a.size,0)||1;
+function paint(done=false){
+ if(finished&&!done)return;
+ const received=critical.reduce((n,a)=>n+Math.min(a.size,loaded.get(a.url)||0),0);
+ const progress=done?100:Math.min(95,Math.round(5+(moduleReady?30:0)+received/total*60));
+ fill.style.transform='scaleX('+progress/100+')';bar.setAttribute('aria-valuenow',progress);screen.dataset.progress=progress;
 }
-function changed(){if(!frame)frame=requestAnimationFrame(paint);}
-async function plan(){
- if(!assets.length){const embedded=document.getElementById('preload-assets');if(embedded){({assets}=JSON.parse(embedded.textContent));return;}const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),60000);try{const response=await fetch('./preload-manifest.json',{cache:'no-cache',signal:controller.signal});if(!response.ok)throw Error('Manifest unavailable');({assets}=await response.json());}finally{clearTimeout(timer);}}
+function help(text){if(finished)return;errorBox.hidden=false;message.textContent=text;screen.setAttribute('aria-busy','false');}
+document.getElementById('reader-shell').inert=true;
+document.getElementById('final-chapter').inert=true;
+document.getElementById('preload-retry').onclick=()=>location.reload();
+skip.hidden=false;
+const app=import('./dialogue.js');
+app.then(()=>{moduleReady=true;paint();},()=>help('页面连接暂时中断，请重试。'));
+const hint=setTimeout(()=>help('正在准备开场，可以先进入。'),5000);
+async function enter(){
+ if(entering)return entering;
+ optional.abort();
+ entering=(async()=>{
+  try{
+   const reader=await settleWithin(app,25000);
+   if(!reader)throw Error('The page code did not arrive');
+   await reader.startReader();
+   finished=true;clearTimeout(hint);clearTimeout(window.__bootWatchdog);
+   paint(true);root.classList.replace('site-booting','site-revealing');screen.classList.add('preload-leaving');
+   await new Promise(resolve=>setTimeout(resolve,260));
+   screen.remove();root.classList.remove('site-revealing');
+   document.getElementById('reader-shell').inert=false;document.getElementById('final-chapter').inert=false;
+   window.dispatchEvent(new Event('site-ready'));
+  }catch(error){entering=null;help('页面暂时未能连接，请点重试。');console.warn('Opening unavailable:',error.message);}
+ })();
+ return entering;
 }
-async function prepare(){
- if(!tasks.length){
-  const [models,music,cards,prologue,hand,chapters]=await Promise.all([
-   import('./model-library.js'),import('./music.js'),import('./identity-card.js'),import('./prologue.js'),import('./ritual-hand.js'),import('./chapter-transit.js')
-  ]);
-  const imageTasks=assets.filter(a=>/\.(png|webp|jpe?g|svg)$/.test(a.url)).map(a=>[a.url,()=>prepareImage(a.url,a.url.includes('/identity-studies/'))]);
-  tasks=[['fonts',async()=>{if(document.fonts){await Promise.all([...document.fonts].map(font=>font.load()));await document.fonts.ready;}}],...imageTasks,...['tutorial','boundary','public','power','privacy','alienation','alienation-two','violence'].map(id=>['model:'+id,()=>models.prepareStudy(id)]),
-   ...Object.keys(music.tracks).map(id=>['music:'+id,async()=>{if(!await music.preloadMusic(id))throw Error('Music could not decode');}]),
-   ['cards',()=>cards.prepareCardFace()],['bell',()=>chapters.prepareEpilogue()],
-   ['hand',()=>hand.prepareHandDetector().catch(()=>null)],
-   ['prologue',()=>prologue.preparePrologue()],
-   ['graphics',async()=>{app=await import('./dialogue.js');await app.prepareReaderGraphics();}],
-   ['finale',()=>import('./finale.js')],['duel',async()=>{const duel=await import('./duel.js');await duel.prepareDuelGraphics();}]
-  ];
- }
- // Image decoding, models and audio are kept sequential here to avoid a CPU spike.
- for(const [name,job] of tasks){if(prepared.has(name))continue;await job();prepared.add(name);changed();await waitFrame();}
-}
-async function reveal(){
- app??=await import('./dialogue.js');await app.startReader();started=true;paint();await waitFrame();await waitFrame();
- root.classList.replace('site-booting','site-revealing');screen.classList.add('preload-leaving');
- await new Promise(resolve=>setTimeout(resolve,matchMedia('(prefers-reduced-motion:reduce)').matches?0:260));
- screen.remove();root.classList.remove('site-revealing');document.getElementById('reader-shell').inert=false;document.getElementById('final-chapter').inert=false;
- window.dispatchEvent(new Event('site-ready'));
-}
-async function run(){
- if(busy)return;busy=true;errorBox.hidden=true;screen.setAttribute('aria-busy','true');
- try{
-  await plan();screen.dataset.phase='download';
-  const failures=await runQueue(assets.filter(a=>!complete.has(a.url)),async item=>{
-   const data=await downloadWithRetry(item,{onProgress:n=>{loaded.set(item.url,n);changed();}});
-   if(data)rememberBytes(item.url,data);complete.add(item.url);
-  },3,{stopOnError:true});
-  if(failures.length){console.warn('Resource downloads failed:',failures.map(({item,error})=>({url:item.url,reason:error.message})));throw Error(failures.length+' resources unavailable');}
-  screen.dataset.phase='prepare';await prepare();await reveal();
- }catch(error){console.warn('Preparation paused:',error.message);errorBox.hidden=false;screen.dataset.phase='retry';screen.setAttribute('aria-busy','false');document.getElementById('preload-retry').focus();}
- finally{busy=false;}
-}
-document.getElementById('reader-shell').inert=true;document.getElementById('final-chapter').inert=true;
-document.getElementById('preload-retry').onclick=run;
-document.getElementById('preload-continue').onclick=async()=>{if(busy)return;busy=true;try{await reveal();}catch{errorBox.hidden=false;busy=false;}};
-run();
+skip.onclick=()=>{help('正在打开页面…');enter();};
+paint();
+const downloads=runQueue(critical,async item=>{
+ if(optional.signal.aborted)return;
+ await downloadWithRetry(item,{attempts:1,timeout:4500,signal:optional.signal,onProgress:n=>{loaded.set(item.url,n);paint();}});
+},3);
+settleWithin(downloads,4500).then(enter);

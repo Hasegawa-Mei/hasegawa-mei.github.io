@@ -1,3 +1,4 @@
+import {settleWithin} from './load-budget.js';
 // As on the epilogue plate, each arm has a long taper and a tight turn
 // at the core. Repeat the same two curves in each quarter of the aperture.
 const star='M0 -1 C.027 -.46 .052 -.208 .13 -.13 S.46 -.027 1 0 C.46 .027 .208 .052 .13 .13 S.027 .46 0 1 C-.027 .46 -.052 .208 -.13 .13 S-.46 .027 -1 0 C-.46 -.027 -.208 -.052 -.13 -.13 S-.027 -.46 0 -1Z';
@@ -11,7 +12,7 @@ const pose=(x,y,angle,r)=>'translate('+x+' '+y+') rotate('+angle+') scale('+r+')
 const beat={land:310,escortsLeave:705,rise:860,contact:1240,wide:1730,pull:1780,end:2500};
 const standbyInk='./assets/standby/cobalt.webp',standbyBirds='./assets/standby/birds.webp';
 let stop=null;
-export function finishCoverEntrance(){stop?.()}
+export function finishCoverEntrance(){stop?.();root.classList.remove('cover-overture')}
 
 // Fast entry followed by a finite braking distance. Position and velocity
 // match at the brake point; velocity reaches zero exactly at the landing.
@@ -197,7 +198,9 @@ function play(){
   function onVisibility(){if(document.hidden&&origin!==undefined)finishCoverEntrance();else schedule()}
   function onMotion(){if(motion.matches)finishCoverEntrance()}
   const observer=new ResizeObserver(measure);
+  const watchdog=setTimeout(finishCoverEntrance,4500);
   stop=()=>{
+    clearTimeout(watchdog);
     stop=null;cancelAnimationFrame(frame);observer.disconnect();
     document.removeEventListener('visibilitychange',onVisibility);window.removeEventListener('hashchange',onRoute);
     window.removeEventListener('pagehide',finishCoverEntrance);motion.removeEventListener('change',onMotion);
@@ -209,7 +212,7 @@ function play(){
   document.addEventListener('visibilitychange',onVisibility);window.addEventListener('hashchange',onRoute);
   window.addEventListener('pagehide',finishCoverEntrance);motion.addEventListener('change',onMotion);
   const plates=[standbyInk,standbyBirds].map(src=>{const img=new Image();img.src=src;return img.decode()});
-  Promise.allSettled([mast.decode(),...plates]).then(()=>{ready=true;measure();schedule()});
+  settleWithin(Promise.allSettled([mast.decode(),...plates]),900).then(()=>{if(!stop)return;ready=true;measure();schedule()});
 }
 if(root.classList.contains('site-booting'))window.addEventListener('site-ready',play,{once:true});else play();
 

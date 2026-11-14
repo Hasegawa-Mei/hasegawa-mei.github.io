@@ -62,7 +62,7 @@ export function initTutorial(begin, back) {
       </div>
       <div class="tutorial-epilogue" hidden>
         <div class="tutorial-quest-copy"><span class="tutorial-kicker">03 / 03　IDENTITY → THE THRONE</span><h1 tabindex="-1">终章，<br>让身份走入对话。</h1><p class="tutorial-quest-lead">抽出身份卡牌，<br>带着它进入王座真理的探寻。</p><div class="tutorial-quest-steps"><p><b>两位旅人，同屏对话。</b><span>保留阅读身份，或补抽一张。掷骰决定先手。</span></p><p><b>用概念，回应 AI 情境。</b><span>轮流出牌、写下理由；八轮之后，可以胜出，也可以平局。</span></p><p><b>对局结束，再回顾。</b><span>回看最终选择、身份解释与模型场景，导出自己的手记。</span></p></div></div>
-        <div class="tutorial-quest-art" aria-hidden="true"><div class="tutorial-quest-ring"></div><div class="tutorial-quest-card">${cardArt(faces.find(f=>f.id==='witness'))}</div><span class="tutorial-quest-arrow">↗</span><img class="tutorial-quest-throne" src="assets/game/throne.png" alt=""><span class="tutorial-quest-caption">YOUR IDENTITY / A NEW DIALOGUE</span></div>
+        <div class="tutorial-quest-art" aria-hidden="true"><div class="tutorial-quest-ring"></div><div class="tutorial-quest-card">${cardArt(faces.find(f=>f.id==='witness'))}</div><span class="tutorial-quest-arrow">↗</span><img class="tutorial-quest-throne" src="assets/game/throne.webp" alt=""><span class="tutorial-quest-caption">YOUR IDENTITY / A NEW DIALOGUE</span></div>
         <div class="tutorial-meaning-actions"><button id="tutorial-finale-back">← 上一步</button><button id="tutorial-begin">正式开启 <span>↗</span></button></div>
       </div>
     </div>

@@ -1,10 +1,12 @@
+import {settleWithin} from './load-budget.js';
 // The flash covers the route swap. Only the two foreground plates lock inward.
 export async function assembleStartGate(swap) {
   const shell = document.getElementById('reader-shell');
   const sheet = document.getElementById('start-sheet');
   const fields = sheet.querySelector('.gate-fields');
   const plates = [...sheet.querySelectorAll('.gate-plates img')];
-  const ready = Promise.all(plates.map(plate => plate.decode())).then(() => true, () => false);
+  plates.forEach(plate=>{plate.loading='eager';});
+  const ready = settleWithin(Promise.all(plates.map(plate => plate.decode())).then(() => true),900,false);
   const flash = document.createElement('div');
   flash.className = 'gate-flash';
   flash.ariaHidden = 'true';
@@ -34,11 +36,11 @@ export async function assembleStartGate(swap) {
   motion.addEventListener('change', fastForward);
   try {
     const fullWhite = 'scale(' + Math.ceil(reach / 17) + ')';
-    await animate(lamp, [
+    await settleWithin(animate(lamp, [
       {transform:'scale(.24)', easing:'cubic-bezier(.42,.01,.88,.54)'},
       {transform:fullWhite, offset:.82},
       {transform:fullWhite}
-    ], {duration:215}).finished;
+    ], {duration:215}).finished,600);
     await swap();
     if (skip()) return;
 
@@ -88,7 +90,7 @@ export async function assembleStartGate(swap) {
     animate(document.getElementById('start-caption'), [{opacity:0},{opacity:1}], {
       delay:lockAt + 20, duration:92, easing:'ease-out'
     });
-    await Promise.all(animations.map(animation => animation.finished));
+    await settleWithin(Promise.all(animations.map(animation => animation.finished)),1600);
   } finally {
     document.removeEventListener('visibilitychange', fastForward);
     motion.removeEventListener('change', fastForward);
