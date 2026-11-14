@@ -1,7 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
-import {downloadAsset,runQueue,progressRatio} from '../docs/preload-core.js';
+import {downloadAsset,downloadWithRetry,runQueue,progressRatio} from '../docs/preload-core.js';
+
+test('a transient connection failure retries and completes the same asset',async()=>{
+ let calls=0;const waits=[];
+ const data=await downloadWithRetry({url:'./film.mp4',size:3},{delay:async ms=>waits.push(ms),fetcher:async()=>{calls++;if(calls===1)throw new TypeError('Failed to fetch');return new Response(new Uint8Array([1,2,3]));}});
+ assert.equal(calls,2);assert.deepEqual(waits,[800]);assert.deepEqual([...new Uint8Array(data)],[1,2,3]);
+});
+
+test('missing assets fail without retries while network retries remain bounded',async()=>{
+ let calls=0;
+ await assert.rejects(downloadWithRetry({url:'./missing.png',size:1},{delay:async()=>{},fetcher:async()=>{calls++;return new Response('',{status:404});}}),/HTTP 404/);
+ assert.equal(calls,1);calls=0;
+ await assert.rejects(downloadWithRetry({url:'./film.mp4',size:1},{delay:async()=>{},fetcher:async()=>{calls++;throw new DOMException('Offline','AbortError');}}),/Offline/);
+ assert.equal(calls,3);
+});
 test('download progress follows bytes and keeps video data for playback',async()=>{
  const received=[];const data=await downloadAsset({url:'./film.mp4',size:5},{onProgress:n=>received.push(n),fetcher:async()=>new Response(new ReadableStream({start(c){c.enqueue(new Uint8Array([1,2]));c.enqueue(new Uint8Array([3,4,5]));c.close();}}))});
  assert.deepEqual([...new Uint8Array(data)],[1,2,3,4,5]);assert.deepEqual(received,[2,5,5]);

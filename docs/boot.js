@@ -1,4 +1,4 @@
-import {runQueue,downloadAsset,progressRatio} from './preload-core.js';
+import {runQueue,downloadWithRetry,progressRatio} from './preload-core.js';
 import {rememberBytes,prepareImage} from './resource-cache.js';
 
 const root=document.documentElement,screen=document.getElementById('site-preloader');
@@ -43,10 +43,10 @@ async function run(){
  try{
   await plan();screen.dataset.phase='download';
   const failures=await runQueue(assets.filter(a=>!complete.has(a.url)),async item=>{
-   const data=await downloadAsset(item,{onProgress:n=>{loaded.set(item.url,n);changed();}});
+   const data=await downloadWithRetry(item,{onProgress:n=>{loaded.set(item.url,n);changed();}});
    if(data)rememberBytes(item.url,data);complete.add(item.url);
-  },5,{stopOnError:true});
-  if(failures.length)throw Error(failures.length+' resources unavailable');
+  },3,{stopOnError:true});
+  if(failures.length){console.warn('Resource downloads failed:',failures.map(({item,error})=>({url:item.url,reason:error.message})));throw Error(failures.length+' resources unavailable');}
   screen.dataset.phase='prepare';await prepare();await reveal();
  }catch(error){console.warn('Preparation paused:',error.message);errorBox.hidden=false;screen.dataset.phase='retry';screen.setAttribute('aria-busy','false');document.getElementById('preload-retry').focus();}
  finally{busy=false;}

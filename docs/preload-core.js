@@ -18,6 +18,16 @@ export async function downloadAsset(item,{fetcher=fetch,onProgress=()=>{},timeou
   const result=new Uint8Array(loaded);let offset=0;for(const chunk of chunks){result.set(chunk,offset);offset+=chunk.byteLength;}return result.buffer;
  }finally{clearTimeout(timer);}
 }
+export async function downloadWithRetry(item,{attempts=3,delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),...options}={}){
+ for(let attempt=0;attempt<attempts;attempt++){
+  try{return await downloadAsset(item,{timeout:60000,...options});}
+  catch(error){
+   const transient=error.name==='AbortError'||error.name==='TimeoutError'||error instanceof TypeError||/^HTTP (408|429|5\d\d)\b/.test(error.message);
+   if(!transient||attempt===attempts-1)throw error;
+   await delay(800*(attempt+1));
+  }
+ }
+}
 export function progressRatio(items,loaded,prepared,totalTasks,started=false){
  const total=items.reduce((n,item)=>n+item.size,0)||1;
  const received=items.reduce((n,item)=>n+Math.min(item.size,loaded.get(item.url)||0),0);
