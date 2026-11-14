@@ -1,0 +1,27 @@
+/* Printed strokes retract and grow through masks; the paper never slides. */
+.chapter-transit{position:fixed;inset:0;z-index:80;overflow:hidden;pointer-events:auto;touch-action:none;isolation:isolate;container-type:size}
+.path-turn #chapter-poster :is(.poster-sort,.poster-lugs,.poster-register-bottom){visibility:hidden!important;transition:none}
+.path-turn #reader-shell :is(header,footer){pointer-events:none}
+.chapter-transit .poster-lugs{visibility:visible;opacity:1}
+.chapter-transit .sort-withdrawal{opacity:1}
+.route-packets{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.epilogue-paper{position:absolute;inset:0;background:#fbfbf9 url('./assets/standby/paper.webp') center/cover no-repeat;opacity:0}
+.epilogue-center{position:absolute;inset:0;z-index:1;container-type:size;pointer-events:none;transform:scale(.76);transform-origin:50.5% 50%}
+.bell-underprint,.bell-wave,.bell-light-star,.bell-pin-light,.bell-reveal{position:absolute;left:50.5%;top:50%;translate:-50% -50%;opacity:0}
+.bell-underprint{width:min(31cqw,57cqh);aspect-ratio:1;border-radius:50%;background:#2521d2 url('./assets/standby/cobalt.webp') center/cover;box-shadow:inset 0 0 0 1px #fff5}
+.bell-wave{width:min(40cqw,73cqh);aspect-ratio:1;border:2px solid #fff;border-radius:50%;box-shadow:0 0 9px 1px #fff,inset 0 0 6px #fff,0 0 20px #526cff70}
+.bell-wave.wave-two{border-width:1px;box-shadow:0 0 4px #fff,0 0 8px #2747ff50}
+.bell-light-star{width:min(72cqw,115cqh);height:auto;fill:white;filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 13px #8b9eff);z-index:2}
+.bell-pin-light{width:25px;aspect-ratio:1;border-radius:50%;background:white;box-shadow:0 0 12px 8px white,0 0 54px 25px #fff,0 0 90px 18px #5959ff;z-index:4}
+.bell-reveal{width:min(40cqw,74cqh);aspect-ratio:1;z-index:3;will-change:transform,opacity}
+.bell-pendulum{position:absolute;inset:0;transform-origin:49% 14%;filter:drop-shadow(0 5px 1px #1c125b20);will-change:transform}
+.bell-pendulum img{position:absolute;display:block;height:auto;pointer-events:none}
+.bell-body{inset:0;width:100%;opacity:.97}
+.bell-clapper{left:10%;top:22%;width:80%;transform-origin:49% 14%}
+.bell-cut-flash{position:absolute;inset:0;z-index:8;opacity:0;background:radial-gradient(ellipse at 50.5% 50%,#fff 0%,#ffffffce 12%,#ffffff00 58%);pointer-events:none}
+@media(max-aspect-ratio:1/1){
+  .bell-underprint{width:min(65cqw,48cqh)}
+  .bell-light-star{width:160cqw}
+  .bell-wave{width:min(84cqw,64cqh)}
+  .bell-reveal{width:min(70cqw,62cqh)}
+}

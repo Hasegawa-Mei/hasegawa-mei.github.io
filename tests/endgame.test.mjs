@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {newMatch,drawIdentity,rollInitiative,beginTurn,selectConcept,submitTurn,nextTurn,agreeAlternative,validSaved,upgradeMatch,winner} from '../docs/duel-state.js';
+import {scenarioById,concepts} from '../docs/duel-data.js';
+import {beginEndgame,beginDesigns,openEndgameGate,submitDesign,beginScoring,submitRating,revealEndgame,concealEndgame,scoreTotal} from '../docs/duel-endgame.js';
+function game(){const s=newMatch('threshold','test');drawIdentity(s,1);rollInitiative(s);beginTurn(s);return s;}
+function respond(s,matched=true){const accepted=scenarioById(s.scenario).accepted;let id=s.players[s.active].hand.find(id=>accepted.includes(id)===matched);if(!id){id=concepts.find(c=>accepted.includes(c.id)===matched).id;s.players[s.active].hand[0]=id;}selectConcept(s,id);s.reason='我会邀请受影响的人一起解释这个方案，并保留能够重新讨论的空间。';submitTurn(s);}
+function enterTie(){const s=game();for(let i=0;i<8;i++){respond(s);nextTurn(s);}assert.equal(s.endgame.trigger,'tie');return s;}
+function check(s){assert.equal(validSaved(structuredClone(s),'test'),true,s.phase);}
+function sealDesign(s){openEndgameGate(s);const d=s.endgame.drafts[s.endgame.active];d.concept=concepts[0].id;d.plan='我会设置由学生教师和受影响者共同参与的公开讨论，同时保留线下表达和复议机制。';d.care='误判者可以选择人工复议，定期检查被遗漏的人群。';submitDesign(s);check(s);}
+function sealRating(s,n){openEndgameGate(s);const r=s.endgame.ratingDrafts[s.endgame.active];r.values=[n,n,n,n];r.comment='方案有清晰的参与机制，但还需要明确具体负责的人。';submitRating(s);check(s);}
+test('one remaining star enters rescue after feedback, with history intact',()=>{const s=game();for(let i=0;i<3;i++){respond(s,false);nextTurn(s);}assert.equal(s.phase,'endgame-intro');assert.equal(s.endgame.trigger,'rescue');assert.equal(s.history.length,3);check(s);});
+test('agreed alternative restores star before trigger is committed',()=>{const s=game();for(let i=0;i<2;i++){respond(s,false);nextTurn(s);}respond(s,false);assert.equal(s.players[s.active].hp,1);agreeAlternative(s,[true,true]);nextTurn(s);assert.equal(s.phase,'play');assert.equal(s.endgame,null);check(s);});
+test('eight equal rounds trigger final design challenge',()=>check(enterTie()));
+test('shared thinking precedes private drafting and survives restoration',()=>{const s=enterTie();beginEndgame(s);assert.equal(s.phase,'endgame-think');check(s);openEndgameGate(s);assert.equal(s.phase,'endgame-think');assert.throws(()=>submitDesign(s));beginDesigns(s);assert.equal(s.phase,'endgame-write-gate');check(s);});
+test('eight non-tied rounds settle normally',()=>{const s=game();for(let i=0;i<8;i++){respond(s,i!==0);nextTurn(s);}assert.equal(s.phase,'outcome');assert.equal(s.endgame,null);assert.notEqual(winner(s),null);check(s);});
+test('sealed scores stay unrevealed, opponent ratings choose winner',()=>{const s=enterTie();beginEndgame(s);beginDesigns(s);check(s);sealDesign(s);assert.equal(s.endgame.designs[1-s.first],null);sealDesign(s);beginScoring(s);sealRating(s,3);assert.equal(s.endgame.revealed,false);assert.equal(s.endgame.ratings[1-s.first],null);sealRating(s,5);assert.equal(s.phase,'endgame-reveal');assert.equal(s.endgame.revealed,false);revealEndgame(s);assert.equal(winner(s),s.first);assert.equal(scoreTotal(s.endgame.ratings[1-s.first]),20);check(s);});
+test('equal design scores share throne',()=>{const s=enterTie();beginEndgame(s);beginDesigns(s);sealDesign(s);sealDesign(s);beginScoring(s);sealRating(s,4);sealRating(s,4);revealEndgame(s);assert.equal(winner(s),null);check(s);});
+test('private drafts are gated on return and invalid sealed scores cannot restore',()=>{const s=enterTie();beginEndgame(s);beginDesigns(s);openEndgameGate(s);concealEndgame(s);assert.equal(s.phase,'endgame-write-gate');sealDesign(s);sealDesign(s);beginScoring(s);openEndgameGate(s);concealEndgame(s);assert.equal(s.phase,'endgame-score-gate');sealRating(s,4);s.endgame.ratings[s.first].values[0]=9;assert.equal(validSaved(s,'test'),false);});
+test('legacy match preserves history when upgraded',()=>{const s=game();respond(s);s.version=1;delete s.endgame;const u=upgradeMatch(s);check(u);assert.equal(u.history.length,1);assert.equal(u.endgame,null);});

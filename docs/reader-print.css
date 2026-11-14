@@ -1,0 +1,115 @@
+/* The axial print and its two working areas are registered in viewport space. */
+.reader-print {display:none}
+.reading-sheet {
+  --axis:52.3vw;--gutter:5vw;--text-width:min(36vw,470px);
+  --reader-top:clamp(90px,13vh,158px);--reader-foot:clamp(130px,16vh,174px);
+  overflow:hidden;
+}
+.reading-sheet .reader-print {
+  display:block;position:fixed;inset:0;pointer-events:none;
+  background:white;
+}
+.reader-print svg {display:block;width:100%;height:100%}
+.print-register {position:absolute;left:var(--axis);top:0;width:0;height:0}
+.reading-sheet #stage {
+  position:fixed;top:9vh;bottom:7vh;left:calc(var(--axis) + 1vw);right:.5vw;height:auto;
+  z-index:1;isolation:isolate;
+}
+.reading-sheet #stage canvas {
+  filter:drop-shadow(1px 9px 8px rgba(36,34,49,.21));
+}
+.reading-sheet .veil {display:none}
+.reading-sheet #reading {
+  position:fixed;left:var(--gutter);right:auto;top:var(--reader-top);bottom:var(--reader-foot);
+  width:var(--text-width);max-width:none;margin:0;padding:0 .45rem 8px 0;
+  overflow:auto;scrollbar-width:thin;scrollbar-color:#9096ac66 transparent;
+  pointer-events:auto;overscroll-behavior:contain;
+}
+.reading-sheet #reading-body {max-height:none;overflow:visible;padding:0}
+.reading-sheet #reading .chapter-head {position:static}
+.reading-sheet #reading .latin {position:static}
+.reading-sheet #object-controls {
+  position:relative;inset:auto;display:none;width:100%;max-width:none;margin:12px 0 0;
+  padding:10px 0 5px;border-top:1px solid #81868888;border-bottom:0;
+  background:transparent;backdrop-filter:none;box-shadow:none;
+}
+.reading-sheet #object-controls::before {display:none}
+.reading-sheet.scene-controls-open #object-controls,.reading-sheet.inspection #object-controls{display:block}
+.reading-sheet #object-controls .switch-row,.reading-sheet #object-controls .case-controls,.reading-sheet #object-controls .power-row,.reading-sheet #object-controls .service-states {flex-wrap:wrap}
+.reading-sheet #object-controls .case-controls,.reading-sheet #object-controls .power-row {gap:12px}
+.reading-sheet .material-selector button {min-width:0;gap:4px}
+.reading-sheet .material-selector svg {width:clamp(22px,2.4vw,38px)}
+.reading-sheet .control-caption{margin-left:0}
+.reading-sheet .source-link{margin-top:9px}
+.reading-sheet #layer-nav {left:var(--gutter);right:auto;width:var(--text-width);max-width:none;bottom:clamp(54px,8vh,92px);background:none}
+.reading-sheet #reflection-echo {
+  position:static;inset:auto;margin:14px 0 0;padding:8px 0 0;
+  background:none;font-size:14px;
+}
+.reading-sheet.inspection #reading {overflow:visible}
+.reading-sheet.inspection #object-controls {position:fixed;inset:auto auto max(7vh,28px) var(--gutter);width:var(--text-width);max-height:45vh;overflow:auto}
+.reading-sheet.inspection .source-link {visibility:hidden}
+.reading-sheet #scene-hotspot,.reading-sheet #scene-annotations {position:fixed}
+.reading-sheet #tutorial {
+  display:block;position:fixed;inset:var(--reader-top) auto max(12vh,76px) var(--gutter);
+  width:var(--text-width);min-height:0;max-width:none;padding:0 .45rem 12px 0;
+  overflow:auto;pointer-events:auto;overscroll-behavior:contain;scrollbar-width:thin
+}
+.reading-sheet .tutorial-copy {width:100%;max-width:none}
+.reading-sheet .tutorial-axis {position:static;display:flex;gap:14px;flex-wrap:wrap;margin:16px 0 0;font-size:14px}
+.reading-sheet .tutorial-axis b {font-size:20px}
+.reading-sheet .chapter-head h1 {font-size:clamp(55px,5.5vw,98px)}
+.reading-sheet.scene-controls-open .chapter-head h1 {font-size:clamp(44px,4.6vw,76px)}
+.reading-sheet.scene-controls-open .quote{font-size:clamp(16px,1.35vw,21px);margin-bottom:12px}
+.reading-sheet header {background:none}
+@media (max-width:900px) {
+  .reading-sheet {--gutter:3.8vw;--text-width:38vw}
+  .reading-sheet .material-selector button {flex-direction:column}
+  .reading-sheet .case-controls .control-caption {display:none}
+}
+@media (max-width:700px) {
+  .reading-sheet {--axis:51vw;--gutter:4vw;--text-width:38vw;--reader-top:clamp(81px,12vh,104px);--reader-foot:112px}
+  .reading-sheet #stage {left:calc(var(--axis) + 1vw);right:0;top:20vh;bottom:20vh;height:auto}
+  .reading-sheet #reading {padding:0 2px 5px 0}
+  .reading-sheet #reading .chapter-head {inset:auto;transform:none}
+  .reading-sheet #reading .latin {margin:8px 0}
+  .reading-sheet #design-name {margin:0 0 14px}
+  .reading-sheet .chapter-head h1,.reading-sheet.scene-controls-open .chapter-head h1 {font-size:clamp(29px,8vw,48px);letter-spacing:-.07em}
+  .reading-sheet .quote {font-size:16px;line-height:1.65}
+  .reading-sheet .responses button {gap:7px;line-height:1.5}
+  .reading-sheet #layer-nav {bottom:57px;padding-top:7px;gap:5px}
+  .reading-sheet #layer-nav .round-arrow {width:28px;height:32px;font-size:20px}
+  .reading-sheet .layer-position {gap:2px;padding:0;flex-direction:column}
+  .reading-sheet .layer-position strong {font-size:14px}
+  .reading-sheet #object-controls .switch-row,.reading-sheet #object-controls .service-states {gap:5px}
+  .reading-sheet #object-controls .case-controls {gap:8px}
+  .reading-sheet .material-selector {gap:1px}
+  .reading-sheet .material-selector button {font-size:14px;min-height:49px}
+  .reading-sheet .case-controls .command-disc {width:30px;height:30px;font-size:20px}
+  .reading-sheet .control-status {overflow-wrap:anywhere}
+  .reading-sheet .bag-progress,.reading-sheet .arrival-steps,.reading-sheet .violence-states {flex-wrap:wrap}
+  .reading-sheet .arrival-steps{gap:3px}
+  .reading-sheet footer {background:linear-gradient(transparent,#ffffffef)}
+  .reading-sheet .axis-hint {display:none}
+  .reading-sheet #tutorial {padding-top:0}
+  .reading-sheet .tutorial-copy h1 {font-size:clamp(25px,6.7vw,42px);letter-spacing:-.05em;margin:14px 0}
+  .reading-sheet .lesson-description,.reading-sheet .demo-question,.reading-sheet .lesson-picks button,.reading-sheet .lesson-experiment p {font-size:14px}
+  .reading-sheet .lesson-description strong {font-size:15px}
+  .reading-sheet .tutorial-word {font-size:23px}
+  .reading-sheet .tutorial-copy .eyebrow {flex-wrap:wrap;gap:5px}
+  .reading-sheet .lesson-picks,.reading-sheet .lesson-actions {flex-wrap:wrap;gap:6px}
+  .reading-sheet #lesson-next {margin-left:0}
+  .reading-sheet .tutorial-axis {display:block;font-size:14px}
+  .reading-sheet .scene-note {width:min(43vw,190px)}
+  .reading-sheet.inspection #object-controls {inset:auto auto 18px var(--gutter);width:var(--text-width)}
+}
+@media(max-height:600px) and (min-width:701px){
+ .reading-sheet{--reader-top:70px;--reader-foot:85px}
+ .reading-sheet header{height:52px}
+ .reading-sheet .chapter-head h1,.reading-sheet .tutorial-copy h1{font-size:41px}
+ .reading-sheet #layer-nav{bottom:38px}
+}
+
+.reading-sheet.scene-controls-open #reading,.reading-sheet[data-reading-phase=reflection] #reading {padding-top:0;padding-bottom:8px}
+.reading-sheet.scene-controls-open #object-controls {inset:auto;width:100%}
+.reading-sheet.inspection #object-controls {position:fixed;inset:auto auto max(7vh,18px) var(--gutter);width:var(--text-width)}

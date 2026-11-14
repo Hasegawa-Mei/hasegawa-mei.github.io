@@ -1,0 +1,6 @@
+.music-control{position:fixed;right:26px;bottom:19px;z-index:140;border:1px solid #7886a52e;border-radius:30px;background:#fbfcffe0;backdrop-filter:blur(12px);color:#526584;font:400 14px/1.4 Arial,sans-serif;letter-spacing:.06em;padding:9px 13px;cursor:pointer;transition:background .3s,color .3s}
+.music-control:hover{background:#edf2ff;color:#2547bd}.music-control:focus-visible{outline:2px solid #3d60cb;outline-offset:4px}
+.prologue-page .music-control,.path-turn .music-control{visibility:hidden;pointer-events:none}
+.in-duel .music-control{bottom:51px;right:18px}
+body:has(.endgame-arrival) .music-control{visibility:hidden;pointer-events:none}
+@media(max-width:600px){.music-control{right:12px;bottom:12px}.in-duel .music-control{bottom:41px}}

@@ -1,0 +1,56 @@
+/* Each plate is registered to the same center; only its printed ink travels. */
+#wake {
+  display:block;padding:0;background:#fafaf8;overflow:hidden;
+}
+#wake:focus-visible {outline:none}
+#wake:focus-visible .idle-subtitle {text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.35em}
+#wake .press-sheet {
+  position:absolute;inset:0;overflow:hidden;isolation:isolate;container-type:size;
+  background:#fbfbf9 url('./assets/standby/paper.webp') center/cover no-repeat;
+  text-indent:0;letter-spacing:normal;
+}
+.press-sheet svg,.press-sheet img,.press-sheet span{display:block;pointer-events:none}
+.press-sheet svg{overflow:visible}
+.press-corner,.press-dial,.travelling-lines,.press-register,.ink-belt,.idle-title,.idle-subtitle{position:absolute}
+.press-corner {width:61cqw;height:auto}
+.upper-wheel {left:6.7%;top:13.7%;translate:-50% -50%;animation:press-turn 195s linear infinite}
+.lower-wheel {left:94.2%;top:79%;width:58cqw;translate:-50% -50%;animation:press-counterturn 229s linear infinite}
+.press-dial {
+  --diameter:min(39cqw,72cqh);left:calc(50.5% - var(--diameter)/2);top:calc(50% - var(--diameter)/2);width:var(--diameter);height:var(--diameter);
+}
+.press-dial>* {position:absolute;left:50%;top:50%;translate:-50% -50%;width:100%;height:auto}
+.press-dial .broad-orbit {width:184%;animation:press-counterturn 330s linear infinite}
+.press-dial .star-spin {width:276%;animation:press-turn 124s linear infinite}
+.press-dial :is(.flock-spin,.flock-ink) {width:64%;animation:press-counterturn 60s linear infinite}
+/* Two registered inks on one transparent feather mask. The silver separation
+   responds to the paper or ultramarine below; the yellow wash carries the hue. */
+.flock-spin {filter:grayscale(1) brightness(1.13);mix-blend-mode:difference;opacity:.78}
+.flock-ink {opacity:.38}
+.outer-beads {animation:press-counterturn 210s linear infinite}
+.inner-beads {animation:press-counterturn 136s linear infinite}
+.travelling-lines,.press-register {inset:0;width:100%;height:100%}
+.travelling-lines {animation:wire-pass 33s ease-in-out infinite alternate}
+.ink-belt {left:0;top:50%;translate:0 -50%;width:100%;height:9.55%}
+.idle-title {left:50%;top:50%;translate:-50% -50%;width:56%;height:9.5%;filter:drop-shadow(0 1px 1px #23213955)}
+#wake .idle-subtitle {
+  left:50%;top:calc(54.8% + 12px);translate:-50% 0;white-space:nowrap;
+  color:#fff;background:transparent;
+  font:700 clamp(15px,1.28cqw,21px)/1.45 var(--serif);letter-spacing:.16em;text-indent:.16em;
+  -webkit-text-stroke:1.55px #383653;paint-order:stroke fill;
+  text-shadow:0 0 3px white,0 0 7px #fffc,0 1px 3px #24214480;
+  animation:caption-lift 5.8s ease-in-out infinite;
+}
+@keyframes caption-lift {0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}
+#ritual:has(#wake:not([hidden])) #art,body[data-phase="guide"] #ritual #art {display:none}
+@keyframes press-turn {to{transform:rotate(1turn)}}
+@keyframes press-counterturn {to{transform:rotate(-1turn)}}
+@keyframes wire-pass {from{transform:translateX(-4%)}to{transform:translateX(4%)}}
+@media(max-aspect-ratio:1/1) {
+  .press-corner{width:106cqw}.upper-wheel{left:-8%;top:18%}.lower-wheel{width:112cqw;left:106%;top:84%}
+  .press-dial{--diameter:min(84cqw,64cqh)}
+  .idle-title{width:88%;height:min(9.5cqh,15cqw)}.ink-belt{height:min(9.8cqh,15.5cqw)}
+  #wake .idle-subtitle{top:calc(50% + min(4.9cqh,7.75cqw) + 10px)}
+}
+@media(prefers-reduced-motion:reduce) {
+  .press-sheet *{animation:none!important}
+}

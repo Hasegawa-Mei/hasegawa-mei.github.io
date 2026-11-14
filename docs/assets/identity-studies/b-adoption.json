@@ -1,0 +1,13 @@
+{
+  "direction": "B",
+  "status": "Selected by user and adopted into finale, gallery, comparison and offline export",
+  "mode": "built-in image_gen",
+  "editTarget": "b-witness.png",
+  "output": "b-witness-v2.png",
+  "prompt": "Use case: precise-object-edit.\nAsset type: transparent cutout character illustration for the approved B direction of a white-and-ultramarine identity card, The Witness / 观照者.\nInput image 1 is the edit target. Correct ONLY the incorrect arm anatomy while preserving this exact sculpture style, high-key neutral bright white material, softly engraved marble details, face, braided hair, blue ribbon, neck pendant, pose looking right, doves, architectural arch, oval portrait medallion, framing and transparent background.\nANATOMY CORRECTION: the reference incorrectly has two separate arms emerging from the viewer-right shoulder. Keep the single raised arm on the viewer-right whose hand shades the forehead, with its continuous anatomically correct shoulder -> upper arm -> bent elbow -> forearm -> hand. Completely REMOVE the extra lower arm and hand that extend to the oval medallion on the far viewer-right, and remove their implied duplicated shoulder. Replace that removed arm area only with a clean natural draped torso edge and transparent negative space. The oval portrait medallion remains floating as an independent decorative emblem, unsupported by a hand. The figure's other arm belongs to the viewer-left shoulder and rests naturally down across the lap, mostly concealed by the existing drapery; if a hand is visible, only one relaxed hand on the lap. Exactly two arms total, two shoulders, no duplicated limbs, no added hands.\nComposition: preserve the original image bounds, seated upper body and upper lap crop, no legs or feet added. Keep the original arrangement and scale of the architecture and medallion. Preserve crisp cutout silhouette and actual transparent alpha. No card border, no lettering, no background. Do not make it a cartoon or add new accessories.",
+  "invariants": [
+    "Other five B portraits unchanged",
+    "Original decorative card stock and back retained",
+    "Shallow fan spacing and interaction retained"
+  ]
+}

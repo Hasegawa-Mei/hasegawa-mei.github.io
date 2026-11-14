@@ -1,0 +1,63 @@
+/* Generated paper plates, transparent engraved cutouts, and moving foil. */
+.identity-print{position:relative;isolation:isolate;width:100%;height:100%;aspect-ratio:2/3;overflow:visible;container-type:inline-size}
+.identity-print img{display:block;user-select:none;pointer-events:none}
+.identity-stock{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;border-radius:2.4%;box-shadow:0 9px 34px #233c7c25}
+.identity-edge{position:absolute;inset:.8%;z-index:1;border:3px solid #fff;border-radius:1.8%;box-shadow:0 0 5px 2px #fff,0 0 18px #b9c7ffbd,inset 0 0 8px #fff;pointer-events:none}
+.identity-portrait-window{position:absolute;inset:0;z-index:3;clip-path:polygon(-40% -45%,140% -45%,140% 54%,100% 62%,100% 86%,0 86%,0 62%,-40% 54%)}
+.identity-character{position:absolute;z-index:3;left:-30%;top:-14%;width:160%;aspect-ratio:1;pointer-events:none}
+.identity-foreground{position:absolute;inset:0;z-index:5;width:100%;height:100%;object-fit:fill;clip-path:polygon(0 58%,12% 58%,12% 82%,25% 86%,40% 86%,50% 83%,60% 86%,75% 86%,88% 82%,88% 58%,100% 58%,100% 100%,0 100%);pointer-events:none}
+.identity-statue{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.identity-prism{position:absolute;inset:0;mask:var(--statue) center/contain no-repeat;background:linear-gradient(118deg,transparent 34%,#74d9ff18 42%,#d0bbff71 46%,#fffbd2bb 48%,#ffffffdc 49%,#c3f5ff8c 51%,transparent 59%);background-size:280% 100%;mix-blend-mode:screen;opacity:.6;animation:identity-foil 7.4s ease-in-out infinite;pointer-events:none}
+.identity-ornament-light{position:absolute;inset:0;mask:var(--statue) center/contain no-repeat;mix-blend-mode:screen;pointer-events:none;background:radial-gradient(ellipse 9% 7% at var(--gem-a,50% 25%),#fff 0%,#d4e6ffbf 22%,#d2c5ff73 43%,transparent 100%),radial-gradient(ellipse 8% 7% at var(--gem-b,75% 36%),#ffffede6 0%,#c4eaff99 40%,transparent 100%);animation:identity-ornament 5.9s ease-in-out infinite}
+.identity-print[data-identity=threshold]{--gem-a:10% 19%;--gem-b:74% 45%}
+.identity-print[data-identity=assembly]{--gem-a:52% 22%;--gem-b:75% 36%}
+.identity-print[data-identity=repair]{--gem-a:72% 36%;--gem-b:79% 18%}
+.identity-print[data-identity=inquiry]{--gem-a:20% 20%;--gem-b:78% 32%}
+.identity-print[data-identity=discern]{--gem-a:80% 27%;--gem-b:18% 12%}
+.identity-print[data-identity=witness]{--gem-a:82% 25%;--gem-b:30% 7%}
+@keyframes identity-ornament{0%,100%{opacity:.15}48%{opacity:.8}64%{opacity:.45}}
+.identity-inlay{position:absolute;inset:1%;z-index:2;border-radius:2%;pointer-events:none;mix-blend-mode:screen;opacity:.62;background:linear-gradient(125deg,transparent 36%,#a7c5ff 45%,#f4bfff 48%,#fff 50%,#f4fac3 52%,#a7efff 55%,transparent 64%);background-size:300% 100%;animation:identity-foil 8.6s ease-in-out infinite;mask:radial-gradient(ellipse 10% 6.5% at 50% 9%,#000 84%,transparent 100%),radial-gradient(ellipse 8% 5.5% at 31% 15%,#000 84%,transparent 100%),radial-gradient(ellipse 8% 5.5% at 69% 15%,#000 84%,transparent 100%),radial-gradient(ellipse 6% 5.5% at 17% 24%,#000 84%,transparent 100%),radial-gradient(ellipse 6% 5.5% at 83% 24%,#000 84%,transparent 100%),linear-gradient(90deg,#000 0 4%,transparent 4% 96%,#000 96%)}
+.identity-back .identity-inlay{mask:radial-gradient(ellipse 29% 30% at 50% 50%,#000 0 91%,transparent 100%),conic-gradient(from 45deg at 50% 50%,#000 0 17deg,transparent 17deg 90deg,#000 90deg 107deg,transparent 107deg 180deg,#000 180deg 197deg,transparent 197deg 270deg,#000 270deg 287deg,transparent 287deg)}
+.identity-jewel{position:absolute;z-index:2;translate:-50% -50%;width:2.4%;aspect-ratio:1;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px #fff,0 0 15px #b7c7ff,0 0 23px #a7c6ff65;animation:identity-glint 4.8s var(--jewel-delay) ease-in-out infinite;pointer-events:none}
+.identity-jewel::before,.identity-jewel::after{content:'';position:absolute;inset:45% -100%;background:linear-gradient(90deg,transparent,#fff,transparent)}
+.identity-jewel::after{rotate:90deg}
+/* The empty cartouche lies at 88.35–93.9% of the stock; both languages share
+   one outlined composition so a font fallback cannot push either line out. */
+.identity-caption{position:absolute;left:23%;right:23%;top:88.35%;height:5.55%;z-index:6;color:#161c34;pointer-events:none}
+.identity-nameplate{display:block;width:100%;height:100%;overflow:hidden}
+@keyframes identity-foil{0%,12%{background-position:130% 50%}62%,100%{background-position:-70% 50%}}
+@keyframes identity-glint{0%,100%{opacity:.45;transform:scale(.72)}48%{opacity:1;transform:scale(1.2)}}
+.printed-ritual{position:absolute;inset:0;perspective:1600px;isolation:isolate;overflow:visible;pointer-events:none}
+.printed-ritual::before{content:'';position:absolute;inset:0;z-index:-2;background:#fff}
+body.in-finale:is([data-phase=array],[data-phase=result]){background:#fff;--fin-paper:#fff}
+#journal{background:#fff}
+.deck-celestial{position:absolute;left:50%;top:49%;translate:-50% -50%;width:min(80vw,82vh);aspect-ratio:1;opacity:var(--deck-form,1);transform:scale(calc(.82 + .18 * var(--deck-form,1)));transition:left 1.1s cubic-bezier(.2,.8,.2,1),opacity .5s;pointer-events:none}
+.star-orbit{position:absolute;inset:3%;border:1px solid #5367e534;border-radius:50%;animation:deck-orbit 64s linear infinite}
+.star-orbit-1{inset:15%;border-color:#6270ce25;animation-duration:93s;animation-direction:reverse}
+.star-orbit-2{inset:-8%;border:1px dashed #7380d82a;animation-duration:118s}
+.orbit-star-position{position:absolute;inset:0;transform:rotate(var(--azimuth));pointer-events:none}
+.orbit-star{position:absolute;left:50%;top:0;width:var(--star-size);aspect-ratio:1;translate:-50% -50%;background:#2943ee;clip-path:polygon(50% 0,57% 42%,100% 50%,57% 58%,50% 100%,43% 58%,0 50%,43% 42%);filter:drop-shadow(0 0 5px #7596ff);animation:orbit-star-pulse 4.7s ease-in-out infinite}
+.orbit-star::after{content:'';position:absolute;inset:43%;border-radius:50%;background:#fff}
+.star-orbit-1 .orbit-star{background:#8d9ee8;animation-delay:-1.9s}
+.star-orbit-2 .orbit-star{background:#425cdb;animation-duration:6.3s}
+.printed-ritual[data-mode=result] .deck-celestial{left:73%;opacity:.38}
+@keyframes orbit-star-pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.identity-slot{position:absolute;left:0;top:0;aspect-ratio:2/3;transform-origin:50% 50%;transform-style:preserve-3d;will-change:transform;pointer-events:none}
+.identity-turner{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.identity-side{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform-style:preserve-3d}
+.identity-front-side{transform:rotateY(180deg)}
+.identity-back-side{transform:rotateY(0deg)}
+.identity-slot[data-selected=true] .identity-edge{box-shadow:0 0 9px 4px white,0 0 26px #8daaff,inset 0 0 10px white}
+.printed-ritual[data-paused=true] *{animation-play-state:paused!important}
+@keyframes deck-orbit{to{rotate:1turn}}
+#array-ui .axis-title h2{font-family:var(--serif);font-size:clamp(23px,2.7vw,40px);max-width:13em}
+#array-ui .axis-title h2 span{display:block;font-size:max(14px,.48em);font-family:var(--sans);font-weight:500;letter-spacing:.13em;margin-top:.5em;color:#475582}
+.identity-rule-note{font-size:14px;line-height:1.8;color:#6d7690;margin:12px 0 0}
+.identity-evidence{color:#253fba!important;font-size:14px!important;letter-spacing:.04em}
+.identity-rule-disclosure{margin-top:28px;border-top:1px solid #233fbd28;padding-top:15px;color:#4c5a7b}
+.identity-rule-disclosure summary{cursor:pointer;font-size:14px;list-style:none;display:flex;justify-content:space-between}
+.identity-rule-disclosure summary::after{content:'＋';color:#263dba}
+.identity-rule-disclosure[open] summary::after{content:'－'}
+#trail .identity-rule-disclosure p{font-size:14px;line-height:1.9}
+@media(max-width:700px){.deck-celestial{width:110vw}.printed-ritual[data-mode=result] .deck-celestial{left:50%;width:93vw}.identity-edge{border-width:2.5px}#array-ui .axis-title{top:4%;left:6%}#array-ui .axis-title h2{font-size:26px;max-width:10em;margin-top:7px}.array-foot{bottom:5%}}
+@media(prefers-reduced-motion:reduce){.identity-print *,.star-orbit,.orbit-star{animation:none!important}.deck-celestial{transition:none}}
