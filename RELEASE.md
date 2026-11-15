@@ -1,10 +1,14 @@
 # 加载优化与机器人对战 · 2026-11-15
 
-本轮已通过 58 项测试及真实浏览器流程检查，正在同步以下两个既有公开站点。发布完成后在此记录版本。
+本轮已通过 58 项测试及真实浏览器流程检查，并已同步发布到两个既有公开站点，保留原网址。
 
 - GitHub Pages：https://hasegawa-mei.github.io/
 - ChatGPT Site：https://arendt-between-worlds.zheiisu.chatgpt.site
 - 入口：built-app-NQPYT2SE.js；样式：built-style-U4XN6HBJ.css。
+- GitHub 代码提交：de3bf9e0fec5450183b6622529f4f242446cd8bb；发布任务成功：https://github.com/Hasegawa-Mei/hasegawa-mei.github.io/actions/runs/43729575256 。线上 HTML 和入口返回 200，已引用新版文件及加载小游戏。
+- ChatGPT Site 第 36 版：appgprj_6adef1069728819186cc983f19b2da2f~appgver_9b778bc61830819192e4e0d33114d120。
+- Site 源码提交：1ba80b38e5b830ce890f0a6e38687b7107786526；部署 appgdep_6af9cf2161608191a2e7ecbc63021dfd，结果 succeeded。
+- 发布前逐一核对 Site dist 与本仓库 docs 的 332 个文件一致；发布包位于上级 between-worlds-v36-loading-bot.tar.gz。
 - 功能、性能体积、文件位置和检查范围见 CODEX_TODO.md 文末。
 
 ---
