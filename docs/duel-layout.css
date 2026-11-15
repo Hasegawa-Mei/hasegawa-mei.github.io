@@ -132,3 +132,17 @@ body.in-duel #music-control{inset:12px auto auto calc(50% - 44px);font-size:11px
 
 /* Match mode controls; retain the existing floating HUD and concept card art. */
 .duel-mode{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0 8px}.duel-mode button{border:1px solid #2849ef45;border-radius:999px;padding:10px 20px;background:#ffffff80;color:#2849ef;font:inherit;cursor:pointer}.duel-mode button[aria-pressed="true"]{background:#2849ef;color:white}.duel-bot-note{max-width:680px;margin:12px auto;font-size:13px;line-height:1.7;color:#405477}.duel-setup>.duel-bot-note{text-align:center}.endgame-page>.duel-bot-note{margin:8px 0 18px}.duel-seat input[readonly]{opacity:.7}
+
+/* Brief full-screen broadcast; the usual floating HUD returns after 2.1 seconds. */
+#duel.duel-broadcasting>:not(.duel-star-notice),#duel.duel-broadcasting>:not(.duel-star-notice) *{animation-play-state:paused!important}
+#duel .duel-star-notice{position:fixed;inset:0;width:100%;height:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:#fff;overflow:hidden;outline:none;box-sizing:border-box;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+#duel .duel-star-notice[open]{display:grid;place-items:center}
+#duel .duel-star-notice::backdrop{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+#duel .duel-star-band{width:100%;box-sizing:border-box;min-height:clamp(110px,19vh,180px);padding:26px max(24px,5vw);display:flex;flex-direction:column;justify-content:center;gap:12px;background:#2849ef;border-block:1px solid #8295ff;box-shadow:0 12px 48px #182c6626;text-align:center;animation:duel-star-arrive .2s ease-out both}
+#duel .duel-star-kicker{margin:0;color:#d8dfff;font:12px/1.4 Arial,'Microsoft YaHei',sans-serif;letter-spacing:.18em}
+#duel .duel-star-line{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:.12em .38em;margin:0;color:#fff;font:500 clamp(26px,3.3vw,48px)/1.4 Arial,'Microsoft YaHei',sans-serif;letter-spacing:.04em}
+#duel .duel-star-name{max-width:100%;overflow-wrap:anywhere}
+#duel .duel-star-line strong{font-weight:600;white-space:nowrap}
+@keyframes duel-star-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-height:500px){#duel .duel-star-band{min-height:104px;padding:19px 24px;gap:8px}#duel .duel-star-kicker{font-size:10px}#duel .duel-star-line{font-size:clamp(22px,3.3vw,32px)}}
+@media(prefers-reduced-motion:reduce){#duel .duel-star-band{animation:none}}
