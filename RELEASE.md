@@ -1,8 +1,12 @@
 # 星星播报与场景停留 · 2026-11-16
 
-本轮已完成：中央蓝色长条播报失星/保星；仅失星轻震；播报期间保持原场景，结束后再更新棋盘与回合结果。已通过 58 项测试及电脑、手机浏览器检查。正在同步两个原有公开站点。
+本轮已完成：中央蓝色长条播报失星/保星；仅失星轻震；播报期间保持原场景，结束后再更新棋盘与回合结果。已通过 58 项测试及电脑、手机浏览器检查。已同步发布到两个原有公开站点。
 
 - 入口：built-app-STQRCUW2.js；样式：built-style-4QO7RBWI.css。
+- GitHub：https://hasegawa-mei.github.io/ ，代码提交 d5f9eaeb536183d2488fa4f6290b76e2da8dbaba；发布任务成功：https://github.com/Hasegawa-Mei/hasegawa-mei.github.io/actions/runs/43751910847 。线上页面与新样式已核对。
+- ChatGPT Site：https://arendt-between-worlds.zheiisu.chatgpt.site ，第 37 版；源码提交 90d67c84cb4f5af7a742ff47e0d69d5f41df093b。
+- Site 版本：appgprj_6adef1069728819186cc983f19b2da2f~appgver_8071890ac5288191b1d689c07121b3af；部署 appgdep_6afa08004fb48191a939c61a36182f55，状态 succeeded。
+- 发布前核对 Site dist 与本地 docs 的 333 个文件一致。发布包位于上级 between-worlds-v37-star-notice.tar.gz。
 - 改动及验证见 CODEX_TODO.md 文末「星星全屏播报」。
 
 ---
