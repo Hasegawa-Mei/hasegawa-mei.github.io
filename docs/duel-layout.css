@@ -1,0 +1,131 @@
+/* Floating HUD: the world stays full bleed and the board keeps the center. */
+#duel.arena-mode{--hud-edge:clamp(18px,2.6vw,44px);--duel-top:58px;--duel-bottom:36px;--hud-glass:linear-gradient(135deg,#ffffffb8,#f5f8ff66 58%,#edf2fc80);--hud-border:1px solid #ffffffb8;--hud-shadow:0 8px 32px #364c7410,inset 0 1px 0 #ffffffd9}
+#duel.arena-mode #duel-world{inset:0;width:100%;height:100%}
+#duel.arena-mode .duel-header{height:var(--duel-top);margin:0 var(--hud-edge);background:none;backdrop-filter:none;border:0}
+#duel.arena-mode .duel-header button{padding:5px 11px;border-radius:999px;background:#ffffff70;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#duel.arena-mode #duel-main{inset:var(--duel-top) 0 var(--duel-bottom)}
+#duel.arena-mode .arena-interface{position:relative;width:100%;height:100%;pointer-events:none}
+#duel.arena-mode :is(.arena-question,.arena-deck-action,.arena-response-hud,.endgame-page){background:var(--hud-glass);border:var(--hud-border);border-radius:18px;box-shadow:var(--hud-shadow);backdrop-filter:blur(16px) saturate(115%);-webkit-backdrop-filter:blur(16px) saturate(115%)}
+/* Read in the upper left, instead of covering the middle of the scene. */
+#duel.arena-mode .arena-question,#duel.arena-mode[data-side="1"] .arena-question{inset:10px auto auto var(--hud-edge);width:clamp(270px,25vw,360px);max-width:calc(100% - 2*var(--hud-edge));max-height:42%;padding:16px 19px;overflow:auto;scrollbar-width:thin;scrollbar-color:#7990b84d transparent;animation:none}
+#duel.arena-mode .arena-question h1{font-size:clamp(23px,1.9vw,28px);line-height:1.4;margin:5px 0 9px}
+#duel.arena-mode .arena-question .duel-kicker{font-size:11px;line-height:1.5;letter-spacing:.13em;margin:0;color:#657797}
+#duel.arena-mode .arena-question .duel-kicker span{display:none}
+#duel.arena-mode .arena-question>p:not(.duel-kicker),#duel.arena-mode .arena-question details{font-size:15px;line-height:1.75}
+#duel.arena-mode .arena-question details{margin-top:6px}
+#duel.arena-mode .arena-question details p{max-height:none}
+#duel.arena-mode .arena-question summary{display:flex;align-items:center;gap:7px;font-size:13px;min-height:32px;list-style:none}
+#duel.arena-mode .arena-question summary::-webkit-details-marker{display:none}
+#duel.arena-mode .arena-question summary:before{content:'＋';font-size:14px}
+#duel.arena-mode .arena-question details[open] summary:before{content:'−'}
+/* The player badge and cards sit at opposite lower corners. */
+#duel.arena-mode .arena-interface .arena-seat-label{inset:auto auto 16px var(--hud-edge);width:auto;max-width:28%;text-align:left;display:none;text-shadow:0 1px 14px #fff,0 1px 5px #fff}
+#duel.arena-mode .arena-interface .arena-seat-label.active{display:block;opacity:1}
+#duel.arena-mode .arena-interface .arena-seat-label>p{font-size:11px;letter-spacing:.07em;margin:0 0 5px}
+#duel.arena-mode .arena-interface .arena-seat-label>p span{margin-left:8px}
+#duel.arena-mode .arena-interface .arena-seat-label h2{font-size:21px;line-height:1.4;letter-spacing:.06em;margin:0;overflow-wrap:anywhere}
+#duel.arena-mode .arena-interface .duel-life{justify-content:flex-start;margin:6px 0 0;gap:9px}
+#duel.arena-mode .arena-interface .duel-star{font-size:15px}
+#duel.arena-mode .arena-deck,#duel.arena-mode[data-side="1"] .arena-deck{inset:auto var(--hud-edge) 8px auto;width:clamp(310px,29vw,420px);max-width:calc(100% - 2*var(--hud-edge));display:flex;flex-direction:column;gap:10px;pointer-events:none}
+#duel.arena-mode .arena-deck-action{order:2;gap:12px;margin:0;padding:9px 11px 9px 16px;border-radius:14px;pointer-events:auto}
+#duel.arena-mode .arena-deck-action>div{flex:1;min-width:0}
+#duel.arena-mode #duel-definition{font-size:13px;line-height:1.6;min-height:0;max-height:64px;overflow:auto;margin:0;color:#3a4d70}
+#duel.arena-mode .arena-deck-action .duel-primary{font-size:14px;min-width:66px;min-height:42px;padding:9px 13px;gap:8px;border-radius:10px}
+#duel.arena-mode .arena-hand{order:1;height:150px;padding:12px 3px 0;align-items:flex-end;justify-content:center;gap:0;box-sizing:content-box}
+/* Concept cards retain their original illustrated frame and stock, separate from glass HUD panels. */
+#duel.arena-mode .arena-concept{flex:0 0 clamp(80px,6.8vw,98px);min-width:0;height:140px;margin-left:-18px;transform:translateY(calc(var(--lift)*.18)) rotate(calc(var(--angle)*.35));transform-origin:50% 100%;border:0;border-radius:5px;background:url('./assets/identity/front-stock.webp') center/100% 100% no-repeat;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;filter:drop-shadow(0 5px 8px #1c315a24)}
+#duel.arena-mode .arena-concept:first-child{margin-left:0}
+#duel.arena-mode .arena-concept strong{font-size:18px;line-height:1.4;left:50%;top:34%;width:2em;translate:-50% 0;text-shadow:0 1px 12px #ffffffc9}
+#duel.arena-mode .arena-concept>span{font-size:10px;left:8%;width:84%;top:78%;color:#3659a3}
+#duel.arena-mode .arena-concept:hover,#duel.arena-mode .arena-concept:focus-visible{transform:translateY(-7px) rotate(0);z-index:20;filter:drop-shadow(0 10px 12px #223d963a)}
+#duel.arena-mode .arena-concept.chosen{transform:translateY(-10px) rotate(0);z-index:15;filter:drop-shadow(0 0 3px #2f54eacc) drop-shadow(0 15px 20px #2f54ea29)}
+#duel.arena-mode .duel-swap{order:3;font-size:12px;line-height:1.5;margin:0;padding:0 10px;text-shadow:0 1px 6px #fff}
+/* Writing is a temporary floating card; it never resizes the world. */
+#duel.arena-mode .arena-response-hud,#duel.arena-mode[data-side="1"] .arena-response-hud{inset:auto var(--hud-edge) 8px auto;width:clamp(320px,32vw,450px);max-width:calc(100% - 2*var(--hud-edge));max-height:calc(100% - 20px);padding:20px 23px;animation:none}
+#duel.arena-mode .arena-response-hud h2{font-size:24px}
+#duel.arena-mode .arena-card-reference{margin:0 0 12px}
+#duel.arena-mode .arena-card-reference summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px;cursor:pointer;list-style:none}
+#duel.arena-mode .arena-card-reference summary::-webkit-details-marker{display:none}
+#duel.arena-mode .arena-card-reference summary>span{font:400 23px/1.4 'STZhongsong','SimSun',serif;color:#294fc2}
+#duel.arena-mode .arena-card-reference small{display:flex;gap:5px;font-size:12px;color:#566e96}
+#duel.arena-mode .arena-card-reference small:after{content:'＋'}
+#duel.arena-mode .arena-card-reference[open] small:after{content:'−'}
+#duel.arena-mode .arena-card-reference .arena-definition{margin:8px 0 0}
+#duel.arena-mode:is(.arena-writing,.arena-feedback) .arena-question details{display:block}
+#duel.arena-mode .arena-response-hud>.duel-kicker{font-size:11px}
+#duel.arena-mode .arena-response-hud :is(.arena-definition,#duel-response label,.duel-reading,.duel-feedback blockquote){font-size:15px;line-height:1.75}
+#duel.arena-mode .arena-response-hud .duel-feedback p{font-size:15px;line-height:1.75}
+#duel.arena-mode .arena-response-hud textarea{font-size:16px;min-height:108px;border-radius:10px;background:#ffffff70}
+#duel.arena-mode .arena-response-actions{gap:12px;margin-top:12px}
+#duel.arena-mode .arena-response-hud .duel-primary{border-radius:10px}
+#duel.arena-mode .duel-footer{inset:auto var(--hud-edge) 0;min-height:var(--duel-bottom);padding:8px 0;box-sizing:border-box;background:none;border:0;font-size:11px;line-height:1.5;text-shadow:0 1px 8px #fff}
+body.in-duel #music-control{inset:12px auto auto calc(50% - 44px);font-size:11px;min-height:32px;padding:6px 10px;background:#ffffff70;border-color:#ffffff8c}
+/* Long endgame forms retain a floating glass surface, never a docked column. */
+#duel.arena-mode .endgame-page,#duel.arena-mode[data-side="1"] .endgame-page,#duel.arena-mode.arena-overview .endgame-page{inset:12px var(--hud-edge) 12px auto;width:min(46%,620px);max-width:none;padding:24px;animation:none}
+#duel.arena-mode #duel-main>.arena-seats{display:none}
+#duel.arena-mode .endgame-heading h1{font-size:26px!important;line-height:1.4}
+@media(max-height:650px) and (min-width:561px){
+ #duel.arena-mode{--hud-edge:max(16px,env(safe-area-inset-left),env(safe-area-inset-right));--duel-top:42px;--duel-bottom:26px}
+ #duel.arena-mode .duel-header{font-size:12px}
+ #duel.arena-mode .duel-header button{font-size:12px;min-height:36px}
+ #duel.arena-mode .duel-header nav{gap:18px}
+ #duel.arena-mode .arena-question,#duel.arena-mode[data-side="1"] .arena-question{top:4px;width:clamp(200px,29vw,270px);max-height:55%;padding:10px 13px;border-radius:14px}
+ #duel.arena-mode .arena-question h1{font-size:19px;margin:3px 0 5px;line-height:1.35}
+ #duel.arena-mode .arena-question .duel-kicker{font-size:10px}
+ #duel.arena-mode .arena-question>p:not(.duel-kicker),#duel.arena-mode .arena-question details{font-size:13px;line-height:1.65}
+ #duel.arena-mode .arena-question details{margin-top:1px}
+ #duel.arena-mode .arena-question summary{min-height:30px;font-size:12px}
+ #duel.arena-mode .arena-interface .arena-seat-label{bottom:10px;max-width:29%}
+ #duel.arena-mode .arena-interface .arena-seat-label>p{font-size:10px;margin-bottom:3px}
+ #duel.arena-mode .arena-interface .arena-seat-label h2{font-size:16px}
+ #duel.arena-mode .arena-interface .duel-life{margin-top:4px;gap:7px}
+ #duel.arena-mode .arena-interface .duel-star{font-size:12px}
+ #duel.arena-mode .arena-deck,#duel.arena-mode[data-side="1"] .arena-deck{width:clamp(260px,34vw,340px);bottom:4px;gap:7px}
+ #duel.arena-mode .arena-hand{height:96px;padding:8px 2px 0}
+ #duel.arena-mode .arena-concept{flex-basis:clamp(59px,7.7vw,74px);height:94px;margin-left:-12px}
+ #duel.arena-mode .arena-concept strong{font-size:15px;top:32%}
+ #duel.arena-mode .arena-concept>span{font-size:9px;top:79%}
+ #duel.arena-mode .arena-concept.chosen{transform:translateY(-6px) rotate(0)}
+ #duel.arena-mode .arena-deck-action{padding:5px 6px 5px 11px;gap:8px;border-radius:12px}
+ #duel.arena-mode #duel-definition{font-size:12px;line-height:1.5;max-height:36px}
+ #duel.arena-mode .arena-deck-action .duel-primary{font-size:13px;min-width:58px;min-height:36px;padding:7px 10px;border-radius:8px}
+ #duel.arena-mode .arena-response-hud,#duel.arena-mode[data-side="1"] .arena-response-hud{width:clamp(280px,39vw,400px);max-height:calc(100% - 8px);bottom:4px;padding:14px 17px;border-radius:14px}
+ #duel.arena-mode .arena-response-hud h2{font-size:20px}
+ #duel.arena-mode .arena-card-reference{margin-bottom:8px}
+ #duel.arena-mode .arena-card-reference summary{min-height:32px}
+ #duel.arena-mode .arena-card-reference summary>span{font-size:20px}
+ #duel.arena-mode .arena-response-hud>.duel-kicker{display:none}
+ #duel.arena-mode .arena-response-hud>.arena-definition{margin-bottom:9px}
+ #duel.arena-mode .arena-response-hud :is(.arena-definition,#duel-response label,.duel-reading,.duel-feedback blockquote){font-size:13px;line-height:1.65}
+ #duel.arena-mode .arena-response-hud .duel-feedback p{font-size:13px;line-height:1.65}
+ #duel.arena-mode .arena-response-hud .duel-feedback blockquote{margin:12px 0}
+ #duel.arena-mode .arena-response-hud .duel-verdict h3{font-size:17px;line-height:1.5}
+ #duel.arena-mode .arena-response-hud textarea{min-height:76px;padding:9px 12px}
+ #duel.arena-mode .arena-response-hud .duel-primary{font-size:13px;min-height:36px;padding:8px 12px}
+ #duel.arena-mode .duel-footer{font-size:10px;padding:5px 0}
+ #duel.arena-mode .endgame-page,#duel.arena-mode[data-side="1"] .endgame-page,#duel.arena-mode.arena-overview .endgame-page{inset:4px var(--hud-edge) 4px auto;width:48%;padding:16px}
+ #duel.arena-mode .endgame-heading h1{font-size:21px!important}
+ #duel.arena-mode .endgame-page h2{font-size:20px;line-height:1.4}
+ #duel.arena-mode .endgame-page :is(p,label,li,.endgame-written){font-size:14px;line-height:1.65}
+ #duel.arena-mode .endgame-page button{font-size:14px;min-height:36px}
+ body.in-duel #music-control{top:7px;font-size:10px;min-height:28px;padding:5px 8px}
+}
+/* Narrow non-touch windows: top and bottom HUD, with the middle left open. */
+@media(max-width:560px){
+ #duel.arena-mode{--hud-edge:16px;--duel-top:48px;--duel-bottom:28px}
+ #duel.arena-mode .duel-header button{font-size:12px}
+ #duel.arena-mode .arena-question,#duel.arena-mode[data-side="1"] .arena-question{width:calc(100% - 2*var(--hud-edge));max-height:27%;top:6px;padding:12px 16px}
+ #duel.arena-mode .arena-question h1{font-size:22px}
+ #duel.arena-mode .arena-question>p:not(.duel-kicker){font-size:14px}
+ #duel.arena-mode .arena-deck,#duel.arena-mode[data-side="1"] .arena-deck{width:calc(100% - 2*var(--hud-edge));bottom:4px}
+ #duel.arena-mode .arena-hand{height:112px}
+ #duel.arena-mode .arena-concept{flex-basis:72px;height:108px;margin-left:-12px}
+ #duel.arena-mode .arena-concept strong{font-size:16px;top:32%}
+ #duel.arena-mode .arena-interface .arena-seat-label{bottom:205px;max-width:60%}
+ #duel.arena-mode .arena-interface .arena-seat-label>p{display:none}
+ #duel.arena-mode .arena-interface .arena-seat-label h2{font-size:16px}
+ #duel.arena-mode .arena-interface .duel-life{display:inline-flex;margin-top:3px}
+ #duel.arena-mode .arena-response-hud,#duel.arena-mode[data-side="1"] .arena-response-hud{width:calc(100% - 2*var(--hud-edge));max-height:58%;bottom:4px;padding:16px}
+ #duel.arena-mode .endgame-page,#duel.arena-mode[data-side="1"] .endgame-page,#duel.arena-mode.arena-overview .endgame-page{inset:12% var(--hud-edge) 4px;width:calc(100% - 2*var(--hud-edge))}
+ body.in-duel #music-control{display:none}
+}

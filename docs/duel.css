@@ -66,3 +66,28 @@ body.in-duel{overflow:hidden;background:#fff}
 #duel-reading-review .reveal-row.visible{opacity:1;transform:none}
 @media(max-width:700px){#duel-reading-review{margin-top:45px;scroll-margin-top:70px}#duel-reading-review .role-reading h2{font-size:27px}#duel-reading-review .role-reading p{font-size:14px}#duel-reading-review .review-context{font-size:14px}#duel-reading-review .end-actions{gap:18px}#duel-reading-review .end-actions>.duel-primary{width:100%}}
 @media(prefers-reduced-motion:reduce){#duel *,#duel *::before,#duel *::after{animation:none!important;transition:none!important}.duel-rise-paths{stroke-dashoffset:0}}
+
+/* —— 白色棋局：准备页与掷骰页（仅呈现）。棋盘格做底，席位是立在格子上的白色方块。 —— */
+#duel[data-phase="setup"],#duel[data-phase="initiative"]{background:
+ linear-gradient(118deg,#ffffffd9 0%,#ffffff00 46%,#c9d0e04d 100%),
+ conic-gradient(#f8f8f6 25%,#eff0f3 0 50%,#f8f8f6 0 75%,#eff0f3 0) 0 72px/clamp(120px,12.5vw,200px) clamp(120px,12.5vw,200px),#f3f4f5}
+#duel[data-phase="setup"] .duel-orbits,#duel[data-phase="initiative"] .duel-orbits{display:none}
+#duel[data-phase="setup"] .duel-header,#duel[data-phase="initiative"] .duel-header{background:#f6f6f5eb}
+.duel-setup{margin-top:30px}
+#duel .duel-setup h1{font-size:clamp(44px,5vw,74px);line-height:1.15;letter-spacing:.04em;margin:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:0 .16em}
+#duel .duel-setup h1::before{content:'[';color:var(--game-blue);font-weight:400;margin-right:.04em}
+#duel .duel-setup h1>span{display:inline-flex;align-items:baseline;margin:0 0 0 0;font-size:15px;color:#4b5f7d}
+#duel .duel-setup h1>span::before{content:']';font:400 clamp(44px,5vw,74px)/1 'Noto Serif SC','Songti SC',serif;color:var(--game-blue);margin-right:22px;letter-spacing:0}
+.duel-seats{gap:44px;margin:26px 0 26px}
+.duel-seat{background:#fff;padding:18px 26px 14px;border-top:3px solid var(--game-blue);box-shadow:26px 30px 0 -6px #bcc5d640,0 1px 0 #fff inset}
+.duel-seat::after{content:'';position:absolute;right:14px;top:14px;width:18px;height:18px;background:conic-gradient(var(--game-blue) 25%,transparent 0 50%,var(--game-blue) 0 75%,transparent 0);opacity:.85}
+.duel-seat-cards{min-height:232px;padding-top:22px}
+.duel-empty-card{background:#f4f5f7;border:0;box-shadow:inset 0 0 0 1px #233eee22,10px 12px 0 -3px #c3cbdb47}
+.duel-start-line{background:#fff;padding:16px 26px;border-top:0;box-shadow:26px 30px 0 -6px #bcc5d640}
+.duel-initiative{margin:34px auto;animation:duel-tile-in .6s cubic-bezier(.2,.8,.2,1) both}
+.duel-dice-pair{gap:56px}
+.duel-dice-pair figure{width:250px;background:#fff;padding:22px 22px 16px;box-sizing:border-box;border-top:3px solid var(--game-blue);box-shadow:26px 30px 0 -6px #bcc5d640}
+.duel-dice-pair figure+figure{background:#f1f2f4;border-top-color:#9aa6c4}
+.duel-dice-pair img{filter:drop-shadow(14px 20px 10px #1d2f6a3d)}
+@keyframes duel-tile-in{from{opacity:0;transform:translate(-14px,22px) rotate(-1.4deg) scale(.975)}to{opacity:1;transform:none}}
+@media(max-width:700px){.duel-seat,.duel-start-line,.duel-dice-pair figure{box-shadow:10px 12px 0 -3px #bcc5d640}.duel-dice-pair{gap:22px}.duel-dice-pair figure{width:44vw;padding:12px}}

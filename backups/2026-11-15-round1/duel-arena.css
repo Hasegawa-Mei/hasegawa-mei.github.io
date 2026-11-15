@@ -1,0 +1,104 @@
+/* One persistent 3D world with readable, mirrored surfaces above it. */
+#duel-world{display:none;position:absolute;inset:0;overflow:hidden;background:#edf0ef;pointer-events:none}
+#duel-world canvas{display:block;width:100%;height:100%}
+#duel.arena-mode{overflow:hidden;background:#edf0ef}
+#duel.arena-mode #duel-world{display:block}
+#duel.arena-mode .duel-orbits{display:none}
+#duel.arena-mode .duel-header{position:absolute;inset:0 0 auto;height:64px;background:transparent;backdrop-filter:none;border-color:#596e8f20;z-index:25}
+#duel.arena-mode .duel-header>span{color:#6e7e98;letter-spacing:.22em}
+#duel.arena-mode .duel-footer{position:absolute;left:3.4vw;right:3.4vw;bottom:0;margin:0;padding:15px 0;pointer-events:none;background:transparent;z-index:22;border-color:#55678422;color:#596b87}
+#duel.arena-mode #duel-main{position:absolute;inset:64px 0 46px;min-height:0;pointer-events:none}
+.arena-interface{height:100%;position:relative}
+.arena-question{position:absolute;left:43%;top:3%;width:38%;max-width:640px;pointer-events:auto;padding:18px 23px;background:linear-gradient(130deg,#ffffffc9,#f5f7f54d);border:1px solid #fff9;border-left:2px solid #3d5ace4d;backdrop-filter:blur(9px);box-shadow:0 12px 38px #3e507407;animation:arena-hud-in .65s both;z-index:5}
+#duel .arena-question h1{font:400 clamp(23px,2.2vw,37px)/1.4 'STZhongsong','SimSun',serif;letter-spacing:0;margin:3px 0 11px}
+.arena-question>p:not(.duel-kicker){font:400 clamp(14px,1.05vw,15px)/1.9 Arial,'Microsoft YaHei',sans-serif;margin:0;color:#40506a}
+.arena-question .duel-kicker{font-size:14px;margin:0 0 6px;letter-spacing:.12em}
+.arena-question .duel-kicker span{margin-left:12px;letter-spacing:0}
+.arena-question details{font-size:14px;line-height:1.9;color:#61718c;margin-top:9px}
+.arena-question summary{width:max-content;cursor:pointer;font-size:14px;color:#4c6098}
+.arena-question details p{max-height:120px;overflow:auto;margin:8px 0 0}
+.arena-seats{position:absolute;inset:0;pointer-events:none;z-index:4}
+.arena-seat-label{position:absolute;top:73%;left:7%;width:23%;text-align:center;transition:opacity .6s;opacity:0}
+.arena-seat-label.active{opacity:1}
+.arena-seat-label>p{font-size:14px;letter-spacing:.15em;color:#68758b;margin:0 0 10px}.arena-seat-label>p span{margin-left:12px;color:#3c5793}
+.arena-seat-label h2{font:400 25px/1.5 'STZhongsong','SimSun',serif;margin:0;color:#263e65;letter-spacing:.15em}
+.arena-seat-label .duel-life{justify-content:center;margin:10px 0 0;gap:13px}
+.arena-seat-label .duel-star{font-size:17px;filter:none}
+.arena-seat-label:nth-child(2){left:auto;right:7%}
+.arena-deck{position:absolute;bottom:0;right:3.6%;width:44%;max-width:660px;pointer-events:none;z-index:8}
+.arena-deck-action{display:flex;align-items:center;justify-content:space-between;gap:25px;padding:13px 16px;margin:0 0 20px;background:linear-gradient(110deg,#f8faf5b5,#ffffff70);backdrop-filter:blur(12px);border:1px solid #fff9;pointer-events:auto}
+.arena-deck-action .duel-kicker{font-size:14px;margin:0 0 5px}
+#duel-definition{font-size:14px;line-height:1.8;color:#435676;margin:0;min-height:36px;max-width:390px}
+.arena-deck-action .duel-primary{padding:12px 21px;min-width:105px;white-space:nowrap;font-size:14px;gap:18px;flex-shrink:0}
+.arena-hand{display:flex;align-items:flex-end;justify-content:center;height:clamp(155px,22vh,245px);padding:15px 0 0;isolation:isolate}
+#duel .arena-concept{pointer-events:auto;flex:0 0 clamp(112px,11vw,170px);height:clamp(168px,16.5vw,255px);position:relative;margin-left:-35px;padding:0;border:0;background:url('./assets/identity/front-stock.webp') center/100% 100% no-repeat;color:#233d81;transform-origin:50% 120%;transform:translateY(calc(32px + var(--lift))) rotate(var(--angle));transition:transform .35s cubic-bezier(.2,.8,.2,1),filter .35s;filter:drop-shadow(0 5px 8px #1c315a24);text-align:center;border-radius:5px}
+#duel .arena-concept:first-child{margin-left:0}
+#duel .arena-concept small{position:absolute;top:36%;left:15%;width:70%;font:400 14px/1.7 Arial;letter-spacing:.08em;color:#7082a5}
+#duel .arena-concept strong{position:absolute;left:14%;top:47%;width:72%;font:500 clamp(15px,1.35vw,21px)/1.5 'STZhongsong','SimSun',serif;letter-spacing:.05em}
+#duel .arena-concept>span{position:absolute;top:89%;left:18%;width:64%;font-size:14px;line-height:1.3;color:#4a5e8b}
+#duel .arena-concept:hover,#duel .arena-concept:focus-visible{transform:translateY(-10px) rotate(calc(var(--angle)*.3));z-index:20;filter:drop-shadow(0 10px 12px #223d963a)}
+#duel .arena-concept.chosen{transform:translateY(-24px) rotate(0deg);z-index:15;filter:drop-shadow(0 0 3px #2f54eacc) drop-shadow(0 15px 20px #2f54ea29)}
+.arena-response-hud{position:absolute;right:5%;top:30%;bottom:3%;width:43%;max-width:680px;padding:25px 28px;pointer-events:auto;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#6b81ba4d transparent;border:1px solid #ffffffd1;border-top:2px solid #3b59df60;background:linear-gradient(135deg,#ffffffea,#f3f6f2d9);backdrop-filter:blur(20px);box-shadow:0 22px 80px #34466316;animation:arena-hud-in .45s both;z-index:10}
+.arena-response-hud h2{font:400 28px/1.4 'STZhongsong','SimSun',serif;margin:0 0 8px;color:#233eee}
+.arena-response-hud .arena-definition{font-size:14px;color:#667792;line-height:1.8;margin:0 0 17px}
+#duel .arena-response-hud #duel-response{border:0;margin:0;padding:0}
+#duel .arena-response-hud #duel-response label{display:block;font-size:14px;line-height:1.8;margin-bottom:10px}
+#duel .arena-response-hud textarea{box-sizing:border-box;width:100%;min-height:135px;resize:vertical;padding:14px 16px;background:#ffffffa3;border:1px solid #cad4e2;font:14px/1.9 Arial,'Microsoft YaHei',sans-serif;color:#2c405c}
+.arena-response-actions{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:16px}
+#arena-back{font-size:14px;color:#637791}
+.arena-response-hud .duel-feedback{margin:0;padding:0;border:0}.arena-response-hud .duel-verdict h3{font-size:20px}.arena-response-hud .duel-reading{font-size:14px;line-height:1.9}.arena-response-hud .duel-feedback blockquote{font-size:14px;margin:18px 0}.arena-response-hud .duel-feedback .duel-primary{margin-top:15px}
+.arena-writing .arena-question,.arena-feedback .arena-question{padding:13px 20px;top:1%}.arena-writing .arena-question details,.arena-feedback .arena-question details{display:none}
+#duel[data-side="1"] .arena-question{left:auto;right:43%}
+#duel[data-side="1"] .arena-deck{right:auto;left:3.6%}
+#duel[data-side="1"] .arena-response-hud{right:auto;left:5%}
+#duel.arena-mode .endgame-page{position:absolute;top:4%;bottom:3%;right:5%;width:46%;max-width:740px;margin:0;box-sizing:border-box;padding:26px 30px 30px;overflow:auto;pointer-events:auto;border:1px solid #ffffffdb;background:linear-gradient(135deg,#ffffffeb,#f4f7f3cf);backdrop-filter:blur(20px);box-shadow:0 25px 80px #324b6e15;scrollbar-width:thin;scrollbar-color:#6b81ba4d transparent;animation:arena-hud-in .7s both}
+#duel.arena-mode[data-side="1"] .endgame-page{right:auto;left:5%}
+#duel.arena-mode .endgame-heading{position:static;display:block;inset:auto;width:auto;height:auto;min-height:0;margin:0 0 20px;padding:0;background:none;border:0;backdrop-filter:none;transform:none}
+#duel.arena-mode .endgame-heading h1{font:400 clamp(23px,2.2vw,33px)/1.5 'STZhongsong','SimSun',serif;letter-spacing:0;margin-bottom:0}
+#duel.arena-mode .endgame-heading .duel-kicker{font-size:14px;margin-bottom:10px}
+#duel.arena-mode .endgame-challenge{border:0;border-left:2px solid #4264bd4d;padding:0 0 0 18px;background:transparent;margin:20px 0}
+#duel.arena-mode .endgame-challenge h2{font-size:23px;margin-bottom:11px}
+#duel.arena-mode .endgame-challenge p{font-size:14px;line-height:1.85}
+#duel.arena-mode .endgame-challenge .endgame-question{font-size:14px;color:#344660}
+#duel.arena-mode .endgame-challenge .endgame-task{padding-top:12px;margin-top:13px}
+#duel.arena-mode .endgame-form{margin-top:20px}
+#duel.arena-mode .endgame-form>label{font-size:14px;margin-top:17px}
+#duel.arena-mode .endgame-form textarea{min-height:120px;background:#ffffffb3;font-size:14px}
+#duel.arena-mode .endgame-form select{background:#ffffffb3;font-size:14px;padding:10px 13px}
+#duel.arena-mode .endgame-form #endgame-care{min-height:90px}
+#duel.arena-mode .endgame-gate{padding:0 0 12px}
+#duel.arena-mode .endgame-seal{width:80px;height:80px;font-size:35px;margin:20px auto}
+#duel.arena-mode .endgame-gate .endgame-gate-message{font-size:16px}
+#duel.arena-mode .endgame-gate>p{font-size:14px}
+#duel.arena-mode .endgame-gate .duel-primary{margin-top:10px}
+.endgame-reference{border-block:1px solid #c9d4e184;padding:12px 0;font-size:14px;line-height:1.8;color:#4b6084}
+.endgame-reference>summary{cursor:pointer;color:#3c5486}
+#duel.arena-mode #endgame-score-form{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-items:start}
+#duel.arena-mode #endgame-score-form>p,#duel.arena-mode #endgame-score-form>label,#duel.arena-mode #endgame-score-form>textarea,#duel.arena-mode #endgame-score-form>button{grid-column:1/-1}
+#duel.arena-mode #endgame-score-form>.endgame-criterion{min-width:0;margin:8px 0;padding:12px 0 10px}
+#duel.arena-mode #endgame-score-form .endgame-criterion>div{gap:7px}
+#duel.arena-mode #endgame-score-form .endgame-criterion span{width:34px;height:32px;font-size:16px}
+#duel.arena-mode #endgame-score-form .endgame-criterion p{min-height:38px;font-size:14px}
+#duel.arena-mode #endgame-score-form #endgame-rating-reason{min-height:90px}
+#duel.arena-mode .endgame-reference .endgame-proposal{margin-top:15px;padding:18px;background:#ffffff70;border:0}
+#duel.arena-mode .endgame-proposals{grid-template-columns:1fr;gap:16px;margin-bottom:20px}
+#duel.arena-mode .endgame-proposal{padding:20px;background:#ffffff80}
+#duel.arena-mode .endgame-proposal .endgame-written{font-size:14px}
+#duel.arena-mode .endgame-criterion{margin:16px 0;padding:13px 0 17px}
+#duel.arena-mode .endgame-criterion legend{font-size:14px}
+#duel.arena-mode .endgame-criterion p{font-size:14px;margin-bottom:9px}
+#duel.arena-mode .endgame-criterion span{width:43px;height:35px;font-size:17px}
+.endgame-think>p{font-size:14px;line-height:1.9;color:#5b6d84}
+.endgame-ready{display:flex;gap:18px;flex-wrap:wrap;margin:22px 0;font-size:14px;color:#374c77}.endgame-ready label{display:flex;gap:8px;align-items:center;cursor:pointer}.endgame-ready input{accent-color:#294bea;width:16px;height:16px}
+#duel.arena-mode.arena-overview .endgame-page{right:27%;left:auto;width:46%}
+.arena-overview .arena-seat-label{opacity:1;top:75%;left:0;width:24%}.arena-overview .arena-seat-label:nth-child(2){left:auto;right:0}
+.endgame-arrival,.endgame-arrival dialog,#endgame-rules-panel{pointer-events:auto}
+.arena-fallback{position:absolute;top:54%;left:7%;width:28%;font-size:14px;line-height:2;color:#7789a2}
+@keyframes arena-hud-in{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+@media(max-width:1100px){#duel.arena-mode #endgame-score-form{grid-template-columns:1fr}#duel.arena-mode #endgame-score-form .endgame-criterion p{min-height:0}}
+@media(min-width:1700px){.arena-seat-label{top:75%}.arena-question{top:6%}.arena-deck{bottom:3%}}
+@media(max-height:740px) and (min-width:851px){#duel.arena-mode .duel-header{height:50px}#duel.arena-mode #duel-main{top:50px;bottom:35px}.arena-question{padding:12px 16px;top:1%;width:40%}#duel .arena-question h1{font-size:24px;margin-bottom:6px}.arena-question>p:not(.duel-kicker){font-size:14px}.arena-hand{height:155px}#duel .arena-concept{flex-basis:112px;height:168px}.arena-deck-action{margin-bottom:14px;padding:9px 12px}.arena-response-hud{top:32%;padding:19px 23px}.arena-seat-label{top:75%}.arena-seat-label h2{font-size:21px}#duel.arena-mode .endgame-page{top:2%;bottom:2%;padding:21px 24px}}
+@media(max-width:850px){#duel.arena-mode .duel-header{height:54px}#duel.arena-mode .duel-header>span{display:none}#duel.arena-mode #duel-main{top:54px;bottom:37px}.arena-question,#duel[data-side="1"] .arena-question{left:auto;right:4%;width:55%;padding:13px 15px;box-sizing:border-box}#duel .arena-question h1{font-size:23px}.arena-question .duel-kicker span{display:none}.arena-question>p:not(.duel-kicker){font-size:14px}.arena-deck,#duel[data-side="1"] .arena-deck{width:60%;right:3%;left:auto}.arena-hand{height:180px}.arena-deck-action{gap:10px;margin-bottom:16px;padding:10px}.arena-deck-action .duel-primary{min-width:70px;padding:11px;gap:8px}#duel .arena-concept{flex-basis:108px;height:162px;margin-left:-41px}.arena-seat-label{top:72%;left:1%;width:30%}.arena-seat-label:nth-child(2){right:1%}.arena-response-hud,#duel[data-side="1"] .arena-response-hud{right:3%;left:auto;width:58%;top:28%;box-sizing:border-box;padding:20px}.arena-writing .arena-question,.arena-feedback .arena-question{top:0}#duel.arena-mode .endgame-page,#duel.arena-mode[data-side="1"] .endgame-page,#duel.arena-mode.arena-overview .endgame-page{left:auto;right:3%;width:62%;padding:20px;top:2%}.arena-overview .arena-seat-label{width:28%}.arena-overview .arena-seat-label:nth-child(2){opacity:0}.endgame-ready{gap:12px}#duel.arena-mode .duel-footer{font-size:14px;padding:12px 0}}
+@media(max-width:560px){.arena-question,#duel[data-side="1"] .arena-question{right:4%;width:92%;top:0;max-height:29%;overflow:auto;background:#ffffffbe}#duel .arena-question h1{font-size:22px}.arena-seat-label,.arena-seat-label:nth-child(2){left:2%;right:auto;top:49%;width:27%}.arena-seat-label>p{font-size:14px;letter-spacing:0}.arena-seat-label>p span{display:block;margin:6px 0}.arena-seat-label h2{font-size:19px}.arena-seat-label .duel-life{gap:8px}.arena-deck,#duel[data-side="1"] .arena-deck{width:92%;right:4%}.arena-hand{height:163px}#duel .arena-concept{flex-basis:101px;height:152px;margin-left:-32px}.arena-deck-action{margin-bottom:16px}#duel-definition{font-size:14px;min-height:34px}.arena-response-hud,#duel[data-side="1"] .arena-response-hud{width:92%;right:4%;top:32%;bottom:1%;padding:20px}.arena-writing .arena-seat-label,.arena-feedback .arena-seat-label{opacity:0}#duel.arena-mode .endgame-page,#duel.arena-mode[data-side="1"] .endgame-page,#duel.arena-mode.arena-overview .endgame-page{top:20%;width:92%;right:4%;bottom:1%;background:#ffffffdb}#duel.arena-mode .endgame-heading h1{font-size:25px!important}#duel.arena-mode .endgame-page~.arena-seats{display:none}.arena-fallback{top:35%;width:86%}}
+@media(prefers-reduced-motion:reduce){.arena-question,.arena-response-hud,#duel.arena-mode .endgame-page{animation:none}.arena-concept,.arena-seat-label{transition:none!important}}
+

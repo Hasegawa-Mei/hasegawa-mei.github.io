@@ -2,6 +2,8 @@
 
 灯塔、飞鸟与王座的游戏：借阿伦特的概念，观察 AI 时代的思考、共同生活与选择。
 
+接手与美化：先读 [Claude 工作入口](CLAUDE.md)，再读 [完整交接说明](HANDOFF.md)。Claude 负责视觉与简单局部 UI 交互，正式检查和复杂底层工作交给 Codex；需要移交的事项记入 [Codex 待办清单](CODEX_TODO.md)。下文测试命令供 Codex 验证时使用。
+
 This is the independent GitHub Pages edition. The existing ChatGPT Site remains separate.
 
 Publish the `docs/` directory from the `main` branch with GitHub Pages.
