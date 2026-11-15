@@ -84,7 +84,7 @@ Codex 完成后更新对应条目的状态、实现结果和实际验证结论�
 
 Claude 修改的就是当前 `github-pages` 工作目录，无需从别处复制覆盖。Codex 已保留白色棋盘、宫殿、王座和灯光设计，在这份修改上继续修复并重新构建。当前 HTML 引用 `built-app-P4ZSDTEY.js` 与 `built-style-GKWWTQZ2.css`；以后构建请以当时生成结果为准。
 
-代码和文档目前只在本地工作区更新，尚未提交、推送或发布。接手时核对的 GitHub `main` 仍为 `c85507c5c1715e8f2a496cb79408e7aabf05bf74`。不要将本地预览通过描述成线上已经更新。
+接手验证时，改动仅存在本地，GitHub 基线为 `c85507c5c1715e8f2a496cb79408e7aabf05bf74`。随后用户明确授权同步发布；本轮已发布至 GitHub Pages 和原 ChatGPT Site，最新状态、版本及地址见 [双站发布记录](RELEASE.md)。
 
 ### 本轮改动
 

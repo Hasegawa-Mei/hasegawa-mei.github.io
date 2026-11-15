@@ -4,7 +4,9 @@
 
 接手与美化：先读 [Claude 工作入口](CLAUDE.md)，再读 [完整交接说明](HANDOFF.md)。Claude 负责视觉与简单局部 UI 交互，正式检查和复杂底层工作交给 Codex；需要移交的事项记入 [Codex 待办清单](CODEX_TODO.md)。下文测试命令供 Codex 验证时使用。
 
-This is the independent GitHub Pages edition. The existing ChatGPT Site remains separate.
+线上地址：[GitHub Pages](https://hasegawa-mei.github.io/) · [ChatGPT Site](https://arendt-between-worlds.zheiisu.chatgpt.site)。2026-11-15 已同步发布；版本和验证见 [双站发布记录](RELEASE.md)。
+
+This is the independent GitHub Pages edition. The existing ChatGPT Site remains separate and requires its own publication.
 
 Publish the `docs/` directory from the `main` branch with GitHub Pages.
 
