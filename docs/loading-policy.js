@@ -23,7 +23,10 @@ async function warm(){
  try{
   while(wanted&&!document.hidden){
    const stage=wanted;wanted=null;
-   const items=manifest.filter(a=>assetStage(a.url)===stage&&!completed.has(a.url));
+   const connection=navigator.connection;
+   if(connection?.saveData||/^(slow-2g|2g|3g)$/.test(connection?.effectiveType||''))continue;
+   // Only small nearby artwork. Audio/video stream on demand; models load by chapter.
+   const items=manifest.filter(a=>assetStage(a.url)===stage&&!completed.has(a.url)&&a.size<250000&&/\.(webp|svg)$/.test(a.url)).slice(0,4);
    // One background request at a time leaves bandwidth for navigation.
    for(const item of items){
     if(wanted||document.hidden)break;

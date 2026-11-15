@@ -30,9 +30,10 @@ async function bootFixture(clickSkip){
  function element(id){if(!elements.has(id))elements.set(id,{hidden:true,inert:false,textContent:'',style:{},dataset:{},classList:{add(){}},attributes:{},setAttribute(k,v){this.attributes[k]=v;},remove(){this.removed=true;}});return elements.get(id);}
  element('preload-assets').textContent=JSON.stringify({assets:[{url:'./assets/opening/paper.webp',size:10}]});
  const bar=element('bar');bar.firstElementChild=element('fill');element('site-preloader').querySelector=()=>bar;
- let starts=0,events=0;const timers=new Set();
+ let starts=0,events=0,disposed=0;const timers=new Set();
  const context={document:{documentElement:root,getElementById:element},window:{dispatchEvent(){events++;}},location:{reload(){}},console,AbortController,Event,
   setTimeout(fn,ms){const t=setTimeout(()=>{timers.delete(t);fn();},Math.min(ms,25));timers.add(t);return t;},clearTimeout(t){clearTimeout(t);timers.delete(t);},
+  mountLoadingGame:()=>()=>{disposed++;},
   settleWithin:(p,ms,f)=>settleWithin(p,Math.min(ms,25),f),configurePreload(){},assetStage,
   runQueue:()=>new Promise(()=>{}),downloadWithRetry:()=>new Promise(()=>{}),
   loadReader:async()=>({startReader:async()=>{starts++;}})};
@@ -44,7 +45,7 @@ async function bootFixture(clickSkip){
  timers.forEach(clearTimeout);
  assert.equal(starts,1);assert.equal(events,1);assert.equal(element('reader-shell').inert,false);
  assert.equal(element('site-preloader').removed,true);assert.equal(classes.has('site-booting'),false);
- assert.equal(bar.attributes['aria-valuenow'],100);
+ assert.equal(bar.attributes['aria-valuenow'],100);assert.equal(element('preload-percent').textContent,'100%');assert.equal(disposed,1);
 }
 test('automatic startup continues when all optional downloads hang',()=>bootFixture(false));
 test('clicking skip during a busy download enters once and restores controls',()=>bootFixture(true));

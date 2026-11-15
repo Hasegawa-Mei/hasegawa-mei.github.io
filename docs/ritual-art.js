@@ -1,3 +1,4 @@
+import {renderQuality} from './render-quality.js';
 import {cutSurface,reliefParts,lightCards} from './glass-relief.js';
 // Engraved paths borrow the prologue's tilted orbit and the book's measured linework.
 import * as T from 'three';
@@ -55,7 +56,7 @@ export function createArt(host){
   let renderer;
   try{renderer=new T.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});}
   catch{return flatArt(host);}
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setClearColor(0xffffff,0);renderer.toneMapping=T.ACESFilmicToneMapping;
+  renderer.setPixelRatio(renderQuality().pixelRatio);renderer.setClearColor(0xffffff,0);renderer.toneMapping=T.ACESFilmicToneMapping;
   host.append(renderer.domElement);
   const scene=new T.Scene(),camera=new T.PerspectiveCamera(33,1,.1,70);
   camera.position.z=10;

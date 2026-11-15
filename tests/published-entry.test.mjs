@@ -15,6 +15,6 @@ test('published HTML executes the generated entry, not a name merely embedded in
   assert.ok(!scripts[0].hasAttribute('onerror'));
   assert.ok(!scripts.some(script=>/boot\.js/.test(script.src)));
   for(const {file,bytes} of manifest.initialModules){assert.equal((await stat(new URL(file,root))).size,bytes);assert.ok(window.document.querySelector('link[rel="modulepreload"][href="'+file+'"]'));}
-  assert.ok(manifest.initialModules.reduce((n,m)=>n+m.bytes,0)<1000000,'ornamental identity lettering must not block opening');
+  assert.ok(manifest.initialModules.reduce((n,m)=>n+m.bytes,0)<225000,'three-dimensional chapters and ornamental lettering must not block opening');
  }finally{await window.happyDOM.abort();window.close();}
 });

@@ -1,4 +1,15 @@
-# 双站发布记录 · 2026-11-15
+# 加载优化与机器人对战 · 2026-11-15
+
+本轮已通过 58 项测试及真实浏览器流程检查，正在同步以下两个既有公开站点。发布完成后在此记录版本。
+
+- GitHub Pages：https://hasegawa-mei.github.io/
+- ChatGPT Site：https://arendt-between-worlds.zheiisu.chatgpt.site
+- 入口：built-app-NQPYT2SE.js；样式：built-style-U4XN6HBJ.css。
+- 功能、性能体积、文件位置和检查范围见 CODEX_TODO.md 文末。
+
+---
+
+# 上一轮双站发布 · 2026-11-15（玻璃 HUD）
 
 本轮界面修改已发布到以下两个既有站点，保留原网址及公开访问范围。
 

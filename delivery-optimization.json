@@ -1,0 +1,120 @@
+{
+  "source": "3b261644f409e5f24d37e459a74e5c1329a2bbb8",
+  "images": [
+    {
+      "file": "docs/assets/epilogue/bell-body.webp",
+      "before": 473988,
+      "after": 341738
+    },
+    {
+      "file": "docs/assets/epilogue/bell-clapper.webp",
+      "before": 90694,
+      "after": 73554
+    },
+    {
+      "file": "docs/assets/game/die.webp",
+      "before": 251968,
+      "after": 187428
+    },
+    {
+      "file": "docs/assets/game/throne.webp",
+      "before": 250042,
+      "after": 177356
+    },
+    {
+      "file": "docs/assets/identity-studies/b-assembly.webp",
+      "before": 370454,
+      "after": 257926
+    },
+    {
+      "file": "docs/assets/identity-studies/b-discern.webp",
+      "before": 498062,
+      "after": 357102
+    },
+    {
+      "file": "docs/assets/identity-studies/b-inquiry.webp",
+      "before": 419102,
+      "after": 297470
+    },
+    {
+      "file": "docs/assets/identity-studies/b-repair.webp",
+      "before": 420812,
+      "after": 282718
+    },
+    {
+      "file": "docs/assets/identity-studies/b-threshold.webp",
+      "before": 318708,
+      "after": 208542
+    },
+    {
+      "file": "docs/assets/identity-studies/b-witness-v2.webp",
+      "before": 327660,
+      "after": 231276
+    },
+    {
+      "file": "docs/assets/identity/back.webp",
+      "before": 655626,
+      "after": 560022
+    },
+    {
+      "file": "docs/assets/identity/front-stock.webp",
+      "before": 518226,
+      "after": 435030
+    },
+    {
+      "file": "docs/assets/opening/blue-plates.webp",
+      "before": 519072,
+      "after": 361204
+    },
+    {
+      "file": "docs/assets/opening/gate-blocks.webp",
+      "before": 173406,
+      "after": 115288
+    },
+    {
+      "file": "docs/assets/opening/gate-collage.webp",
+      "before": 1720876,
+      "after": 665696
+    },
+    {
+      "file": "docs/assets/opening/helix.webp",
+      "before": 308746,
+      "after": 258256
+    },
+    {
+      "file": "docs/assets/opening/lighthouse-print.webp",
+      "before": 266348,
+      "after": 178434
+    },
+    {
+      "file": "docs/assets/opening/start-doves.webp",
+      "before": 234986,
+      "after": 96224
+    },
+    {
+      "file": "docs/assets/standby/birds.webp",
+      "before": 222372,
+      "after": 161614
+    },
+    {
+      "file": "docs/assets/standby/cobalt.webp",
+      "before": 410808,
+      "after": 288352
+    },
+    {
+      "file": "docs/assets/standby/graphite.webp",
+      "before": 369108,
+      "after": 284710
+    },
+    {
+      "file": "docs/assets/standby/paper.webp",
+      "before": 137818,
+      "after": 45358
+    },
+    {
+      "file": "docs/assets/standby/silver.webp",
+      "before": 350852,
+      "after": 264706
+    }
+  ]
+}

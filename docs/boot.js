@@ -1,10 +1,12 @@
 import {runQueue,downloadWithRetry} from './preload-core.js';
 import {configurePreload,assetStage} from './loading-policy.js';
 import {settleWithin} from './load-budget.js';
+import {mountLoadingGame} from './preload-game.js';
 const root=document.documentElement,screen=document.getElementById('site-preloader');
 const bar=screen.querySelector('[role="progressbar"]'),fill=bar.firstElementChild;
 const errorBox=document.getElementById('preload-error'),message=document.getElementById('preload-message');
 const skip=document.getElementById('preload-continue');
+const percent=document.getElementById('preload-percent'),disposeGame=mountLoadingGame();
 let entering=null,finished=false,moduleReady=false;
 const optional=new AbortController(),loaded=new Map();
 const assets=JSON.parse(document.getElementById('preload-assets').textContent).assets;
@@ -16,6 +18,7 @@ function paint(done=false){
  const received=critical.reduce((n,a)=>n+Math.min(a.size,loaded.get(a.url)||0),0);
  const progress=done?100:Math.min(95,Math.round(5+(moduleReady?30:0)+received/total*60));
  fill.style.transform='scaleX('+progress/100+')';bar.setAttribute('aria-valuenow',progress);screen.dataset.progress=progress;
+ if(percent)percent.textContent=progress+'%';
 }
 function help(text){if(finished)return;errorBox.hidden=false;message.textContent=text;screen.setAttribute('aria-busy','false');}
 document.getElementById('reader-shell').inert=true;
@@ -33,7 +36,7 @@ async function enter(){
    const reader=await settleWithin(app,25000);
    if(!reader)throw Error('The page code did not arrive');
    await reader.startReader();
-   finished=true;clearTimeout(hint);clearTimeout(window.__bootWatchdog);
+   finished=true;disposeGame();clearTimeout(hint);clearTimeout(window.__bootWatchdog);
    paint(true);root.classList.replace('site-booting','site-revealing');screen.classList.add('preload-leaving');
    await new Promise(resolve=>setTimeout(resolve,260));
    screen.remove();root.classList.remove('site-revealing');

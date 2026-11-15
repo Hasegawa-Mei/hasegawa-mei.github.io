@@ -1,0 +1,1 @@
+function o(t=globalThis){let i=!!t.matchMedia?.("(pointer: coarse)").matches||!!t.matchMedia?.("(max-width: 900px)").matches,e=t.navigator?.deviceMemory,a=i||e>0&&e<=4;return{pixelRatio:Math.min(t.devicePixelRatio||1,a?1:1.35),shadow:a?1024:2048,samples:a?0:2,interval:a?1e3/30:0}}export{o as a};

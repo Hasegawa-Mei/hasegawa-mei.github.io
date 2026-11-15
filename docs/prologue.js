@@ -1,3 +1,4 @@
+import {renderQuality} from './render-quality.js';
 import {assetURL,preparedImage} from './resource-cache.js';
 import {setMusic,syncPrologue,musicReadyIn} from './music.js';
 import * as T from 'three';
@@ -34,7 +35,7 @@ function buildTimeline(){
 }
 function buildScene(){if(renderer)return;
  try{
- renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(1.5,devicePixelRatio));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.75;$('prologue-render').append(renderer.domElement);
+ renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});renderer.setPixelRatio(renderQuality().pixelRatio);renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.75;$('prologue-render').append(renderer.domElement);
  scene=new T.Scene();scene.background=new T.Color('#000000');scene.fog=new T.FogExp2('#000000',.025);camera=new T.PerspectiveCamera(30,3,.1,100);scene.add(new T.AmbientLight('#93a8ff',.12));
  keyLight=new T.SpotLight('#dae7ff',45,25,.39,.65,1.5);keyLight.position.set(-3,5,5);keyLight.target.position.set(0,1,0);scene.add(keyLight,keyLight.target);
  const rim=new T.DirectionalLight('#253ee8',1.2);rim.position.set(-4,3,-4);scene.add(rim);

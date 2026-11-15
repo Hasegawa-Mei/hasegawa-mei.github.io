@@ -1,3 +1,4 @@
+import {renderQuality} from './render-quality.js';
 import * as T from 'three';
 const OUTLINE_LAYER=29;
 
@@ -5,7 +6,7 @@ const OUTLINE_LAYER=29;
 export class FocusLens {
   constructor(renderer) {
     this.renderer=renderer;
-    this.target=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:2});
+    this.target=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:renderQuality().samples});
     this.uniforms={tScene:{value:this.target.texture},uResolution:{value:new T.Vector2(1,1)},uFocus:{value:new T.Vector2(.7,.5)},uRadius:{value:.24},uBlur:{value:5}};
     this.uniforms.tSilhouette={value:null};
     this.uniforms.uStroke={value:new T.Vector2()};
@@ -58,7 +59,7 @@ export class FocusLens {
       obj.layers.enable(OUTLINE_LAYER);
     });
     if(this.silhouette)return;
-    this.silhouette=new T.WebGLRenderTarget(this.target.width,this.target.height,{samples:2});
+    this.silhouette=new T.WebGLRenderTarget(this.target.width,this.target.height,{samples:renderQuality().samples});
     this.maskMaterial=new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide,toneMapped:false});
     this.uniforms.tSilhouette.value=this.silhouette.texture;
   }

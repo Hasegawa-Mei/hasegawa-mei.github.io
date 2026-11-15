@@ -1,11 +1,17 @@
 import {concepts,scenarios,scenarioById} from './duel-data.js';
 import {pendingEndgame,startEndgame,endgameChallenges,endgamePhases,validEndgame,endgameWinner} from './duel-endgame.js';
 const identityIds=['threshold','assembly','repair','inquiry','discern','witness'];
-export const MATCH_VERSION=3;
+export const MATCH_VERSION=4;
 export const HAND_SIZE=5;
 export function randomIndex(length){const n=new Uint32Array(1),limit=Math.floor(4294967296/length)*length;do{crypto.getRandomValues(n);}while(n[0]>=limit);return n[0]%length;}
 const shuffle=list=>{const a=[...list];for(let i=a.length-1;i>0;i--){const j=randomIndex(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
-export function newMatch(readingFace,readingRound){const inherited=identityIds.includes(readingFace)?readingFace:null;return {version:MATCH_VERSION,handSize:HAND_SIZE,id:crypto.randomUUID(),readingRound,phase:'setup',players:[{name:'旅人一',inherited,extra:null,face:inherited,hp:3,hand:[]},{name:'旅人二',inherited:null,extra:null,face:null,hp:3,hand:[]}],turn:0,first:0,active:0,scenario:null,selected:null,reason:'',history:[],rolls:[],swapNote:'',endgame:null,created:Date.now()};}
+export function newMatch(readingFace,readingRound,mode='human'){const inherited=identityIds.includes(readingFace)?readingFace:null;return {version:MATCH_VERSION,mode:mode==='bot'?'bot':'human',handSize:HAND_SIZE,id:crypto.randomUUID(),readingRound,phase:'setup',players:[{name:'旅人一',inherited,extra:null,face:inherited,hp:3,hand:[]},{name:mode==='bot'?'机器人':'旅人二',inherited:null,extra:mode==='bot'?'inquiry':null,face:mode==='bot'?'inquiry':null,hp:3,hand:[]}],turn:0,first:0,active:0,scenario:null,selected:null,reason:'',history:[],rolls:[],swapNote:'',endgame:null,created:Date.now()};}
+export function setMatchMode(state,mode){
+ if(state.phase!=='setup'||!['human','bot'].includes(mode))return;
+ state.mode=mode;const p=state.players[1];
+ if(mode==='bot'){p.name='机器人';if(!p.face)drawIdentity(state,1);}
+ else if(p.name==='机器人')p.name='旅人二';
+}
 export function drawIdentity(state,side){if(state.phase!=='setup')return;const p=state.players[side],pool=identityIds.filter(id=>id!==p.inherited);p.extra=pool[randomIndex(pool.length)];p.face=p.extra;}
 export function chooseIdentity(state,side,id){if(state.phase!=='setup')return;const p=state.players[side];if([p.inherited,p.extra].includes(id)&&id)p.face=id;}
 export function rollInitiative(state){if(state.phase!=='setup'||state.players.some(p=>!p.face))throw Error('请先为两位旅人选择身份。');const hand=shuffle(concepts.map(c=>c.id)).slice(0,HAND_SIZE);state.handSize=HAND_SIZE;state.players.forEach(p=>{p.hand=shuffle(hand);p.hp=3;});state.rolls=[];let a,b;do{a=randomIndex(6)+1;b=randomIndex(6)+1;state.rolls.push([a,b]);}while(a===b);state.first=a>b?0:1;state.phase='initiative';state.history=[];state.turn=0;return state.rolls;}
@@ -19,8 +25,8 @@ export function agreeAlternative(state,consents){if(state.phase!=='feedback'||!c
 export function nextTurn(state){if(state.phase!=='feedback')return;const trigger=pendingEndgame(state);state.turn++;if(trigger){startEndgame(state,trigger,randomIndex(endgameChallenges.length));return;}beginTurn(state);}
 export function winner(state){const final=endgameWinner(state.endgame);return final!==undefined?final:state.players[0].hp===state.players[1].hp?null:state.players[0].hp>state.players[1].hp?0:1;}
 export function upgradeMatch(state){
- if(![1,2].includes(state?.version))return state;
- const upgraded=structuredClone(state);upgraded.version=MATCH_VERSION;upgraded.endgame??=null;upgraded.handSize??=4;
+ if(![1,2,3].includes(state?.version))return state;
+ const upgraded=structuredClone(state);upgraded.version=MATCH_VERSION;upgraded.mode='human';upgraded.endgame??=null;upgraded.handSize??=4;
  if(upgraded.phase==='setup')upgraded.handSize=HAND_SIZE;
  else if(upgraded.handSize===4&&['initiative','play','feedback'].includes(upgraded.phase)&&upgraded.history?.length<8&&upgraded.players?.every(p=>Array.isArray(p.hand))){
   const used=new Set([...upgraded.players.flatMap(p=>p.hand),...upgraded.history.map(h=>h.concept)]);
@@ -32,7 +38,7 @@ export function upgradeMatch(state){
 }
 export function validSaved(state,readingRound){
  const concept=id=>concepts.some(c=>c.id===id),face=id=>id===null||identityIds.includes(id),side=i=>i===0||i===1,hp=n=>Number.isInteger(n)&&n>=0&&n<=3;
- if(!state||![4,HAND_SIZE].includes(state.handSize)||state.version!==MATCH_VERSION||state.readingRound!==readingRound||!['setup','initiative','play','feedback','outcome',...endgamePhases].includes(state.phase))return false;
+ if(!state||!['human','bot'].includes(state.mode)||![4,HAND_SIZE].includes(state.handSize)||state.version!==MATCH_VERSION||state.readingRound!==readingRound||!['setup','initiative','play','feedback','outcome',...endgamePhases].includes(state.phase))return false;
  if(!Array.isArray(state.players)||state.players.length!==2||!state.players.every(p=>p&&typeof p.name==='string'&&p.name.length<=20&&face(p.face)&&face(p.extra)&&face(p.inherited)&&hp(p.hp)&&Array.isArray(p.hand)&&p.hand.length<=state.handSize&&p.hand.every(concept)))return false;
  if(!side(state.first)||!side(state.active)||!Number.isInteger(state.turn)||state.turn<0||state.turn>8||typeof state.reason!=='string'||state.reason.length>400)return false;
  if(!Array.isArray(state.history)||state.history.length>8||!state.history.every(h=>h&&side(h.player)&&scenarioById(h.scenario)&&concept(h.concept)&&typeof h.reason==='string'&&hp(h.before)&&hp(h.after)&&typeof h.matched==='boolean'&&typeof h.overridden==='boolean'))return false;

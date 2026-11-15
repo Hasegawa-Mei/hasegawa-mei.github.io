@@ -1,3 +1,5 @@
+import {renderQuality} from './render-quality.js';
+const quality=renderQuality();
 import * as T from 'three';
 import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 import {RoundedBoxGeometry} from './vendor/RoundedBoxGeometry.js';
@@ -15,9 +17,9 @@ async function cardMap(id){
  if(cardMaps.has(id))return cardMaps.get(id);
  const promise=(async()=>{
   const [stock,portrait]=await Promise.all([picture('./assets/identity/front-stock.webp'),picture(identityPortraits[id])]);
-  const canvas=document.createElement('canvas');canvas.width=1120;canvas.height=1520;
+  const canvas=document.createElement('canvas');const scale=quality.interval?0.5:1;canvas.width=1120*scale;canvas.height=1520*scale;
   const c=canvas.getContext('2d'),x=160,y=180,w=800,h=1200;
-  c.drawImage(stock,x,y,w,h);c.save();c.beginPath();
+  c.scale(scale,scale);c.drawImage(stock,x,y,w,h);c.save();c.beginPath();
   [[-.4,-.45],[1.4,-.45],[1.4,.54],[1,.62],[1,.86],[0,.86],[0,.62],[-.4,.54]].forEach(([px,py],i)=>c[i?'lineTo':'moveTo'](x+px*w,y+py*h));c.closePath();c.clip();
   c.drawImage(portrait,x-w*.3,y-h*.14,w*1.6,w*1.6);c.restore();c.save();c.beginPath();
   [[0,.58],[.12,.58],[.12,.82],[.25,.86],[.4,.86],[.5,.83],[.6,.86],[.75,.86],[.88,.82],[.88,.58],[1,.58],[1,1],[0,1]].forEach(([px,py],i)=>c[i?'lineTo':'moveTo'](x+px*w,y+py*h));c.closePath();c.clip();c.drawImage(stock,x,y,w,h);c.restore();
@@ -73,7 +75,7 @@ export class DuelArena{
   try{
    await Promise.all([prepareStudy('boundary'),prepareStudy('power')]);
    const r=this.renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-   r.setPixelRatio(Math.min(devicePixelRatio,1.35));r.shadowMap.enabled=true;r.shadowMap.type=T.PCFSoftShadowMap;r.toneMapping=T.ACESFilmicToneMapping;r.toneMappingExposure=.86;this.host.append(r.domElement);
+   r.setPixelRatio(quality.pixelRatio);r.shadowMap.enabled=true;r.shadowMap.type=T.PCFSoftShadowMap;r.toneMapping=T.ACESFilmicToneMapping;r.toneMappingExposure=.86;this.host.append(r.domElement);
    r.domElement.setAttribute('aria-label','强光下的白色棋盘。王座立在棋盘尽头，两位旅人的身份牌立在两侧，每回合在棋盘上落下一枚棋子');
    this.scene=new T.Scene();this.scene.background=new T.Color('#e2e5ea');this.scene.fog=new T.Fog('#e2e5ea',40,110);
    this.camera=new T.PerspectiveCamera(36,1,.1,150);
@@ -86,7 +88,7 @@ export class DuelArena{
  buildLight(){
   // 冷色天光让阴影带一点群青；暖白主光压低角度，拉出长影。
   this.scene.add(new T.HemisphereLight('#eef2ff','#4458b0',.2));
-  const sun=this.sun=new T.DirectionalLight('#fff3df',5);sun.position.set(-15,8.4,9.5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+  const sun=this.sun=new T.DirectionalLight('#fff3df',5);sun.position.set(-15,8.4,9.5);sun.castShadow=true;sun.shadow.mapSize.set(quality.shadow,quality.shadow);
   Object.assign(sun.shadow.camera,{left:-17,right:17,top:15,bottom:-15,near:1,far:60});sun.shadow.bias=-.0002;sun.shadow.normalBias=.03;sun.shadow.radius=1.7;this.scene.add(sun);
   const rim=this.rim=new T.DirectionalLight('#cfdcff',1.15);this.rim.position.set(11,7,-13);this.scene.add(this.rim);
   // 灯塔的光：一束冷白聚光，跟随当前回合的旅人。
@@ -175,7 +177,7 @@ export class DuelArena{
   for(const side of [-1,1])arch(side*(SEAT_X+2.5),-1.2,-side*1.05,2.1,5.2,1.05);
  }
  setupDepth(){
-  this.target=new T.WebGLRenderTarget(1,1,{depthTexture:new T.DepthTexture(1,1),samples:2,type:T.HalfFloatType});this.target.texture.colorSpace=T.LinearSRGBColorSpace;
+  this.target=new T.WebGLRenderTarget(1,1,{depthTexture:new T.DepthTexture(1,1),samples:quality.samples,type:T.HalfFloatType});this.target.texture.colorSpace=T.LinearSRGBColorSpace;
   this.postScene=new T.Scene();this.postCamera=new T.OrthographicCamera(-1,1,1,-1,0,1);
   // 朦胧感保留：远处与最近处轻微失焦，四角略收光；清晰区留给棋盘。
   this.post=new T.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{colorMap:{value:this.target.texture},depthMap:{value:this.target.depthTexture},pixel:{value:new T.Vector2(1,1)},near:{value:.1},far:{value:150},focus:{value:23},haze:{value:1}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:`
@@ -212,7 +214,7 @@ export class DuelArena{
  }
  shots(list){const still=reduced();this.from={...this.view};this.queue=list.map(([to,duration])=>({to,duration:still?0:duration}));this.moveStarted=performance.now();}
  async show(info,players,side,success=false,overview=false,beat={}){
-  if(!this.scene)return;this.running=true;this.success=success;this.endgame=!!info.endgame;this.activeSide=side;this.overview=overview;
+  if(!this.scene)return;if(!this.running)this.renderer.setAnimationLoop(t=>this.frame(t));this.running=true;this.success=success;this.endgame=!!info.endgame;this.activeSide=side;this.overview=overview;
   const fresh=this.key!==info.id;
   if(fresh){if(this.model){this.scene.remove(this.model.root);dispose(this.model.root);}this.key=info.id;this.amount=0;this.model=makeScene(info,true);this.model.root.position.y=STAGE_TOP;this.model.root.scale.setScalar(MODEL);this.model.root.userData.rise=reduced()?1:0;this.scene.add(this.model.root);}
   this.sync(beat,side);
@@ -267,6 +269,7 @@ export class DuelArena{
   this.cards.forEach(card=>{card.rotation.y=Math.atan2(this.camera.position.x-card.position.x,this.camera.position.z-card.position.z)*.72;});
  }
  frame(t){
+  if(t-(this.renderedAt??-Infinity)<quality.interval-.5)return;this.renderedAt=t;
   if(!this.running||!this.host?.isConnected||document.hidden){this.lastTime=t;return;}
   const dt=Math.min(.05,(t-this.lastTime)/1000||.016),still=reduced(),D=T.MathUtils.damp;this.lastTime=t;this.tickCamera(t);
   this.amount=D(this.amount||0,this.success?1:0,4,dt);this.model?.animate(still?0:t/1000,this.amount);
@@ -286,5 +289,5 @@ export class DuelArena{
   if(this.cursor.visible)this.cursor.material.opacity=still?.75:.5+.35*Math.sin(t*.003);
   this.renderer.setRenderTarget(this.target);this.renderer.render(this.scene,this.camera);this.renderer.setRenderTarget(null);this.renderer.render(this.postScene,this.postCamera);
  }
- suspend(){this.running=false;}
+ suspend(){this.running=false;this.renderer?.setAnimationLoop(null);}
 }

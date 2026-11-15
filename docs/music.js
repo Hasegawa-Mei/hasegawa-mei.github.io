@@ -115,6 +115,6 @@ function init(){
  window.addEventListener('pageshow',unlock);
  window.addEventListener('site-ready',()=>{readyAt=context?.currentTime??0;readyWall=performance.now();unlock();});
  setInterval(schedule,250);
- preloadMusic('ambient');preloadMusic('prologue');unlock();
+ unlock();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();

@@ -129,3 +129,6 @@ body.in-duel #music-control{inset:12px auto auto calc(50% - 44px);font-size:11px
  #duel.arena-mode .endgame-page,#duel.arena-mode[data-side="1"] .endgame-page,#duel.arena-mode.arena-overview .endgame-page{inset:12% var(--hud-edge) 4px;width:calc(100% - 2*var(--hud-edge))}
  body.in-duel #music-control{display:none}
 }
+
+/* Match mode controls; retain the existing floating HUD and concept card art. */
+.duel-mode{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0 8px}.duel-mode button{border:1px solid #2849ef45;border-radius:999px;padding:10px 20px;background:#ffffff80;color:#2849ef;font:inherit;cursor:pointer}.duel-mode button[aria-pressed="true"]{background:#2849ef;color:white}.duel-bot-note{max-width:680px;margin:12px auto;font-size:13px;line-height:1.7;color:#405477}.duel-setup>.duel-bot-note{text-align:center}.endgame-page>.duel-bot-note{margin:8px 0 18px}.duel-seat input[readonly]{opacity:.7}
