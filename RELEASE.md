@@ -1,3 +1,24 @@
+# Claude 新版整合 · 2026-11-16
+
+代码、构建和交接说明已统一，GitHub Pages 已更新；ChatGPT Site 发布包连续两次上传超时，尚未保存新版本或部署，仍为第 37 版。不要把「源码已推送」误认为「Site 已上线」。
+
+- 本轮内容：Claude 第二、三轮的探索控件与七章场景细节；Codex 修复手机横屏控件遮挡/裁切、章节导航与音乐按钮重叠，并给新灯饰接入轻量设备预算。
+- 验证：58 项测试、发布入口检查、七章双配置场景状态检查通过；电脑和手机横屏的代表性流程通过。详细范围与截图见 CODEX_TODO.md 文末。
+- 入口：built-app-ZWRAGCZX.js；样式：built-style-3MT5ADEE.css；首屏脚本 191,006 字节。
+- GitHub：https://hasegawa-mei.github.io/ ，代码提交 6a434d464ebb0f62c4f16a20b7d1761588ffc3be；发布任务成功：https://github.com/Hasegawa-Mei/hasegawa-mei.github.io/actions/runs/43836869441 。线上 HTML 已引用新入口/样式，样式文件与本地字节一致。
+
+## ChatGPT Site 续发位置
+
+- 站点：https://arendt-between-worlds.zheiisu.chatgpt.site
+- 保持项目 ID：appgprj_6adef1069728819186cc983f19b2da2f，公开访问范围不变。
+- 源码已经由 Site helper 推送，提交：c514637a9cb84dc3e5695f8b6290876462b9b57b。
+- 工作副本：上级 .sites-release/.sites-checkout；其 dist 与本仓库 docs 的 333 个文件逐一核对一致，原有额外说明保留。
+- 完整发布包：上级 between-worlds-v38-claude-integration.tar.gz，122,813,427 字节。文件名中的 v38 只是预定版本名称，服务尚未返回第 38 版或版本 ID。
+- 失败原因：save_site_version 在上传 archive 时，两次均约 300 秒后返回文件上传超时。未取得 saved version ID，也没有发起 deploy_site_version。
+- 继续发布时先确认 Site 源码 HEAD 仍为上述提交；若未变化，复用该 SHA 与同一发布包保存版本，再使用返回的真实版本 ID 部署。若源码已有新改动，必须重新同步、核对、打包。发布成功后更新本记录与 HANDOFF.md；不能直接把旧第 37 版重新部署当作本轮发布。
+
+---
+
 # 星星播报与场景停留 · 2026-11-16
 
 本轮已完成：中央蓝色长条播报失星/保星；仅失星轻震；播报期间保持原场景，结束后再更新棋盘与回合结果。已通过 58 项测试及电脑、手机浏览器检查。已同步发布到两个原有公开站点。
