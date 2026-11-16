@@ -169,3 +169,73 @@ body.reading-sheet{--text-width:min(40vw,550px)}
  #duel .arena-concept{height:175px;flex-basis:112px}
 }
 
+
+/* —— 探索控件：iOS 式分段选择、开关与胶囊按钮（仅呈现，不改交互含义）。蓝色沿用全书主色。 —— */
+#reader-shell #object-controls{border:0;border-radius:20px;padding:9px 11px 7px;background:#ffffffbd;backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px #1c2a5c24,0 18px 44px -22px #1a285a4d}
+#reader-shell #object-controls:before{display:none}
+#reader-shell #object-controls :is(.material-selector,.service-states,.violence-states,.ai-state-controls){display:flex;gap:2px;padding:3px;margin:0 0 4px;border:0;border-radius:12px;background:#7680a026}
+#reader-shell #object-controls :is(.material-selector,.service-states,.violence-states,.ai-state-controls) button{flex:1 1 0;justify-content:center;align-items:center;min-height:36px;padding:2px 8px;border:0;border-radius:9px;background:none;box-shadow:none;color:#3b4763;text-align:center;transition:background .22s,box-shadow .22s,color .22s,transform .12s}
+#reader-shell #object-controls :is(.material-selector,.service-states,.violence-states,.ai-state-controls) button[aria-pressed=true]{background:#fff;color:var(--blue);font-weight:600;box-shadow:0 0 0 .5px #0b174014,0 3px 8px -2px #0b174033,0 1px 1px #0b17401a}
+#reader-shell #object-controls :is(.material-selector,.service-states,.violence-states,.ai-state-controls) button:active:not(:disabled){transform:scale(.97)}
+#reader-shell #object-controls .violence-states button>span{font-size:20px}
+#reader-shell #object-controls :is(.switch-row,.case-switches,.power-switches){gap:2px 14px;align-items:center;min-height:0;padding-top:0}
+#reader-shell #object-controls .switch{display:inline-flex;align-items:center;gap:8px;min-height:32px;color:#2c3650}
+#reader-shell #object-controls .switch-track{position:relative;flex:none;width:42px;height:26px;border:0;border-radius:13px;clip-path:none;background:#7680a03d;transition:background .25s}
+#reader-shell #object-controls .switch-track:after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 5px #0b17403d,0 0 0 .5px #0b174012;transform:none;transition:transform .28s cubic-bezier(.3,1.35,.5,1)}
+#reader-shell #object-controls .switch[aria-checked=true] .switch-track{background:var(--blue)}
+#reader-shell #object-controls .switch[aria-checked=true] .switch-track:after{transform:translateX(16px)}
+#reader-shell #object-controls .switch:active .switch-track:after{width:26px}
+#reader-shell #object-controls .switch[aria-checked=true]:active .switch-track:after{transform:translateX(12px)}
+#reader-shell #object-controls :is(.view-button,.original-link){display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;margin:0;border-radius:15px;background:#233eee14;color:var(--blue);font-weight:600;transition:background .2s,transform .12s}
+#reader-shell #object-controls .original-link{margin-top:6px;font-weight:500}
+#reader-shell #object-controls :is(.view-button,.original-link):active{background:#233eee29;transform:scale(.97)}
+#reader-shell #object-controls .command-button{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:5px 20px 5px 5px;border-radius:26px;background:var(--blue);color:#fff;font-weight:600;box-shadow:0 8px 18px -10px #233eeeb3;transition:transform .12s,filter .2s}
+#reader-shell #object-controls .command-button:active:not(:disabled){transform:scale(.97);filter:brightness(.92)}
+#reader-shell #object-controls .command-button:disabled{background:#7680a03d;color:#5b6680;box-shadow:none}
+#reader-shell #object-controls .command-disc{flex:none;width:38px;height:38px;border:0;border-radius:50%;clip-path:none;background:#ffffff33;color:#fff;box-shadow:none;display:grid;place-items:center}
+#reader-shell #object-controls .reference-feature{padding:5px 16px 5px 5px;border-radius:26px;background:#233eee14;transition:background .2s}
+#reader-shell #object-controls .reference-feature[aria-pressed=true]{background:#233eee26}
+#reader-shell #object-controls .arrival-steps button{border-radius:50%}
+#reader-shell #object-controls :is(.case-controls,.power-row,.bag-progress,.street-progress){border-bottom:0}
+#reader-shell #object-controls .control-status{margin:5px 0 0;padding-top:5px;border-top:.5px solid #1c2a5c24}
+#reader-shell #object-controls button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){#reader-shell #object-controls :is(button,.switch-track,.switch-track:after){transition:none}}
+#reader-shell #object-controls :is(.case-controls,.power-row,.bag-controls){min-height:0;padding:4px 0 2px;margin-bottom:0}
+
+/* Compact landscape HUD: keep the exhibition clear and every control scrollable. */
+@media (orientation:landscape) and (max-width:900px) and (max-height:600px){
+ body.reading-sheet{--gutter:18px;--text-width:min(44vw,360px)}
+ body.reading-sheet #reading{--text-width:min(44vw,360px)}
+ #reader-shell header{height:52px;left:18px;right:18px}
+ #reader-shell header nav{gap:12px}
+ body.reading-sheet.unit-open:not(.inspection) #reading{left:18px;right:auto;top:60px;bottom:auto;width:var(--text-width);max-height:calc(60dvh - 138px);padding:0 5px 0 0;overflow:auto}
+ body.reading-sheet.unit-open:not(.inspection) #reading .chapter-head h1{font-size:26px;line-height:1.1}
+ body.reading-sheet.unit-open:not(.inspection) #reading .eyebrow{font-size:12px;margin-bottom:5px}
+ body.reading-sheet.unit-open:not(.inspection) #design-name{font-size:16px;margin:5px 0 8px}
+ body.reading-sheet.unit-open:not(.inspection) #reading .quote{font-size:15px;line-height:1.6}
+ #reader-shell .latin{display:none}
+ body.reading-sheet.unit-open:not(.inspection) #object-controls{position:fixed;left:18px;right:auto;top:auto;bottom:66px;width:var(--text-width);max-height:40dvh;padding:8px 10px;border:0}
+ body.reading-sheet.unit-open:not(.inspection) #layer-nav{left:18px;right:auto;bottom:16px;width:var(--text-width);padding-top:5px;background:none}
+ body.reading-sheet.unit-open:not(.inspection) #layer-nav .round-arrow{width:32px;height:32px}
+ body.reading-sheet.unit-open:not(.inspection) #layer-nav .layer-position{flex-direction:row;gap:8px}
+ body.reading-sheet.unit-open:is([data-reading-phase=impression],[data-reading-phase=reflection]) #reading{max-height:calc(100dvh - 130px)}
+ body.reading-sheet.inspection #reading{top:60px;bottom:auto;width:var(--text-width);max-height:78px;overflow:hidden}
+ body.reading-sheet.inspection #reading .chapter-head{transform:none}
+ body.reading-sheet.inspection #reading .chapter-head h1{font-size:26px}
+ body.reading-sheet.inspection #object-controls{left:18px;right:auto;bottom:20px;width:var(--text-width);max-height:calc(100dvh - 166px);overflow:auto;box-sizing:border-box}
+ #reader-shell #object-controls{border-radius:16px;overscroll-behavior:contain;scrollbar-width:thin}
+ #reader-shell #object-controls :is(button,.switch,.control-status){font-size:14px;line-height:1.5}
+ #reader-shell #object-controls :is(.bag-progress,.street-progress){flex-wrap:wrap;gap:3px 7px;font-size:12px}
+ #reader-shell #object-controls .command-button{min-height:38px;padding:3px 12px 3px 3px;gap:6px}
+ #reader-shell #object-controls .command-disc{width:30px;height:30px;font-size:22px}
+ #reader-shell #object-controls .switch{min-height:36px}
+ #reader-shell #object-controls .ai-state-controls button{flex:1 1 44%}
+ #reader-shell #object-controls :is(.material-selector,.service-states,.violence-states) button{min-width:0;padding:3px 5px}
+ #reader-shell #object-controls .material-selector svg{height:22px;width:28px}
+}
+
+/* Chapter navigation must remain separate from the persistent music button. */
+.unit-page #reader-shell footer #next{position:fixed;left:auto;right:140px;bottom:18px}
+@media (orientation:landscape) and (max-width:900px) and (max-height:600px){
+ .unit-page #reader-shell footer #previous{position:fixed;left:calc(min(44vw,360px) + 34px);right:auto;bottom:18px}
+}

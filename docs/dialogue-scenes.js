@@ -3,12 +3,32 @@ import {withAIStudies} from './ai-scenes.js';
 import {withProposalStudies} from './proposal-scenes.js';
 import {parkTree,foldedSeat,benchArm,hinge,weatherHardware} from './product-finish.js';
 import * as T from 'three';
+import {renderQuality} from './render-quality.js';
+// Keep the warm lamp artwork on every device; extra real lights use the desktop budget.
+const decorativeLights=renderQuality().interval===0;
 import {box,cyl,torus,sphere,rod,group,glass,createScene as originalScene} from './scenes.js';
 const blue='#243dca',paper='#eceeed';
 function mat(color,roughness=.5,metalness=0){return new T.MeshStandardMaterial({color,roughness,metalness});}
-const chalk=mat('#eff0ed'),wood=mat('#e4e2da',.87),steel=mat('#d2d7de',.28,.65),rope=mat('#d5d0c4',1),ink=mat('#292f3d',.4),azure=mat(blue,.27,.25);
+// 主体是哑光塑料：粗糙度高，带一层很浅的绒面反光，边缘更柔。
+const chalk=new T.MeshPhysicalMaterial({color:'#f8f8f6',roughness:.66,sheen:.3,sheenRoughness:.4,sheenColor:'#ffffff'}),wood=mat('#e4e2da',.87),steel=mat('#d2d7de',.28,.65),rope=mat('#d5d0c4',1),ink=mat('#292f3d',.4),azure=mat(blue,.27,.25);
 const crystal=new T.MeshPhysicalMaterial({color:'#e3ecff',roughness:.055,transmission:.94,thickness:.32,ior:1.48,dispersion:.65,metalness:0,envMapIntensity:2.15,clearcoat:.6,clearcoatRoughness:.045});
 const crownGlass=new T.MeshPhysicalMaterial({color:'#ffffff',roughness:.035,transmission:.96,thickness:.38,ior:1.5,dispersion:0,envMapIntensity:2.4,side:T.DoubleSide});
+// —— 单元场景的细节材质：整体仍是白色，蓝色只作点缀。纹理由固定种子生成，不新增素材文件。——
+function veinMap(seed,vein='#93a0c0'){
+ const size=256,canvas=document.createElement('canvas');canvas.width=canvas.height=size;const c=canvas.getContext('2d');let v=seed;const r=()=>(v=(v*16807)%2147483647)/2147483647;
+ c.fillStyle='#ffffff';c.fillRect(0,0,size,size);
+ for(let pass=0;pass<2;pass++){c.filter=pass?'blur(.5px)':'blur(5px)';for(let i=0;i<(pass?9:6);i++){let x=r()*size,y=r()*size;const a=r()*Math.PI*2;c.beginPath();c.moveTo(x,y);for(let k=0;k<6;k++){x+=Math.cos(a+(r()-.5)*1.5)*50;y+=Math.sin(a+(r()-.5)*1.5)*50;c.lineTo(x,y);}c.strokeStyle=vein;c.globalAlpha=pass?.12+r()*.14:.07+r()*.07;c.lineWidth=pass?.5+r():5+r()*12;c.stroke();}}
+ const map=new T.CanvasTexture(canvas);map.colorSpace=T.SRGBColorSpace;map.wrapS=map.wrapT=T.RepeatWrapping;map.anisotropy=4;return map;
+}
+const marble=new T.MeshStandardMaterial({color:'#fcfcfa',roughness:.24,map:veinMap(11)}),satin=new T.MeshPhysicalMaterial({color:'#fbfbf9',roughness:.5,sheen:.25,sheenRoughness:.4,sheenColor:'#ffffff'}),brushed=mat('#e2e5ea',.36,.6),joint=mat('#dfe2e8',.9),
+ porcelain=new T.MeshPhysicalMaterial({color:'#fbfbfa',roughness:.28,clearcoat:.55,clearcoatRoughness:.22}),lamp=new T.MeshStandardMaterial({color:'#fff6e0',emissive:'#ffd98a',emissiveIntensity:1.5,roughness:.4}),
+ frost=new T.MeshPhysicalMaterial({color:'#fffdf6',roughness:.46,transmission:.86,thickness:.2,ior:1.45,envMapIntensity:.6,emissive:'#ffd27a',emissiveIntensity:.22}),wick=new T.MeshBasicMaterial({color:'#ffc95e'});
+// 磨砂玻璃灯罩，里面一颗黄色的点状灯芯；需要时带一盏很弱的暖色点光。
+function glowLamp(p,x,y,z,r=.1,light=true){const g=group(p,x,y,z);const shade=sphere(g,r,0,0,0,frost);shade.castShadow=false;const core=sphere(g,r*.38,0,0,0,wick);core.castShadow=false;if(light&&decorativeLights){const l=new T.PointLight('#ffd58a',.9,2.6,2);g.add(l);}return g;}
+// 几个单元共用的装饰件：灯柱、花箱、铺地。y 为所在地面的高度。
+function lampPost(p,x,z,face=1,y=.113){const g=group(p,x,y,z);cyl(g,.07,.05,0,.025,0,brushed);cyl(g,.026,1.85,0,.95,0,satin,.02);rod(g,[0,1.86,0],[face*.34,1.92,0],.014,brushed);cyl(g,.05,.03,face*.34,1.925,0,brushed);glowLamp(g,face*.34,1.82,0,.105);return g;}
+function planterBox(p,x,z,y=.113){const g=group(p,x,y,z);box(g,.5,.3,.5,0,.15,0,satin,.04);box(g,.44,.02,.44,0,.3,0,joint,.01);for(const [dx,dz,r] of [[-.08,.03,.2],[.1,-.06,.17],[.02,.12,.14]])sphere(g,r,dx,.42+r*.5,dz,chalk);box(g,.5,.012,.012,0,.24,.252,azure,0);return g;}
+function paving(p,w,d,x,z,step=.5,y=.1165){const g=group(p,x,y,z),pale=mat('#f3f4f6',.92);box(g,w,.006,d,0,0,0,pale,0);for(let v=-d/2+step;v<d/2-.01;v+=step)box(g,w,.002,.006,0,.0045,v,joint,0);for(const sx of [-1,1])box(g,.008,.003,d,sx*w/2,.0045,0,brushed,0);g.traverse(o=>{if(o.isMesh)o.castShadow=false;});return g;}
 function glaze(g,m=crystal){g.traverse(o=>{if(o.isMesh){o.material=m;o.castShadow=false;}});return g;}
 const mix=(a,b,t)=>T.MathUtils.lerp(a,b,t);
 function capsule(p,r,h,a,b,m=chalk){const av=new T.Vector3(...a),bv=new T.Vector3(...b),d=bv.clone().sub(av);const o=new T.Mesh(new T.CapsuleGeometry(r,Math.max(.001,d.length()-2*r),5,12),m);o.castShadow=true;o.position.copy(av.add(bv).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());p.add(o);return o;}
@@ -21,7 +41,11 @@ function human(p,x,z,seated=false,seatHeight=.80){
 function wheelchair(p,x,z){const g=group(p,x,0,z);g.name='Wheelchair_Assembly';const h=human(g,0,0,true,.12+.490*1.17);
  if(placeAsset(g,'WHEELCHAIR',0,.12,0,1.17))return g;
  h.scale.setScalar(.95);for(const s of [-1,1]){torus(g,.30,.032,s*.31,.40,.06,ink,Math.PI/2).rotation.y=Math.PI/2;torus(g,.247,.012,s*.35,.40,.06,steel,Math.PI/2).rotation.y=Math.PI/2;rod(g,[s*.28,.40,.06],[s*.28,.26,.55],.023,steel);torus(g,.09,.023,s*.27,.19,.54,ink,0).rotation.y=Math.PI/2;rod(g,[s*.25,.42,.07],[s*.25,1.01,-.15],.022,steel);rod(g,[s*.25,.88,-.15],[s*.25,.88,.30],.025,azure);}box(g,.5,.05,.48,0,.72,.05,azure,.025);box(g,.48,.38,.045,0,.92,-.17,azure,.025);box(g,.44,.04,.2,0,.14,.56,steel,.02);return g;}
-function ground(root){box(root,6.8,.16,4.5,0,.01,0,chalk,.12);box(root,6.67,.025,4.37,0,.101,0,mat('#f5f5f1'),.10);for(let i=0;i<4;i++){box(root,.05,.012,.05,2.63+i*.11,.123,1.91,['#d43e89','#9cbd3c','#e3d634','#27b7cc'][i],.004);}for(let i=0;i<4;i++)box(root,6.5,.006,.009,0,.119,-1.55+i*.95,mat('#dcdedc'),0);}
+function ground(root){box(root,6.8,.16,4.5,0,.01,0,chalk,.12);box(root,6.67,.025,4.37,0,.101,0,mat('#f5f5f1'),.10);
+ // 展台细节：浅色砖缝与一圈蓝色嵌线。只接收阴影，不遮挡路线与热点。
+ const lines=group(root,0,.1142,0);for(let i=-2;i<=2;i++)box(lines,.007,.003,4.2,i*1.1,0,0,joint,0);for(let i=-1;i<=1;i++)box(lines,6.5,.003,.007,0,0,i*1.1,joint,0);
+ for(const z of [-2.06,2.06])box(lines,6.4,.004,.012,0,.001,z,azure,0);for(const x of [-3.2,3.2])box(lines,.012,.004,4.132,x,.001,0,azure,0);lines.traverse(o=>{if(o.isMesh)o.castShadow=false;});
+for(let i=0;i<4;i++){box(root,.05,.012,.05,2.63+i*.11,.123,1.91,['#d43e89','#9cbd3c','#e3d634','#27b7cc'][i],.004);}for(let i=0;i<4;i++)box(root,6.5,.006,.009,0,.119,-1.55+i*.95,mat('#dcdedc'),0);}
 function path(root,points,color=blue){const curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)));const o=new T.Mesh(new T.TubeGeometry(curve,40,.018,6,false),mat(color,.4));root.add(o);return o;}
 function tree(p,x,z,s=1){return parkTree(p,x,z,s,{wood,chalk,steel});}
 function sign(p,x,z){const g=group(p,x,0,z);cyl(g,.025,1,0,.62,0,steel);box(g,.45,.32,.045,0,1.14,0,glass,.015);box(g,.20,.025,.015,0,1.15,.04,azure,.005);return g;}
@@ -33,6 +57,9 @@ function fence(){const root=group();ground(root);tree(root,-2.7,-1.45,.85);tree(
    if(type===2){for(let j=1;j<8;j++)box(pivot,.026,2.05,.026,j*1.25/8,1.18,0,steel,.006);for(const y of [.32,2.2])box(pivot,1.25,.055,.055,.625,y,0,steel,.01);}
   }
  }
+ // —— 细节（仅装饰）：步道铺地、围栏下的矮路缘、灯柱、花箱与树下卵石。——
+ paving(root,.74,3.9,-.7,.15);box(root,6.3,.012,.15,0,.12,0,satin,.004).castShadow=false;lampPost(root,2.95,1.55,-1);planterBox(root,-2.95,1.55);
+ for(const [x,z,r] of [[-2.35,-1.2,.09],[-2.2,-1.5,.06],[2.95,-1.3,.07],[2.3,-1.85,.05]])sphere(root,r,x,.113+r*.45,z,porcelain,[1,.55,.85]);
  const visitor=traveler(root),chair=wheelchair(root,-.7,1.18);glaze(chair.children[0]);chair.rotation.y=Math.PI;
  const mark=sign(root,1.8,.28),walkPath=path(root,[[-.7,.133,1.9],[-.7,.133,.7],[-.7,.133,-1.55]]),gatePath=path(root,[[-.7,.134,1.9],[-.3,.134,.9],[.65,.134,.4],[.65,.134,-.7],[1,.134,-1.6]]);
  const warning=group(root);for(let i=0;i<4;i++){box(warning,.65,.018,.10,-1.2+i*.8,.14,-1.3,azure,.01).rotation.y=-.5;if(i<3){const cone=new T.Mesh(new T.ConeGeometry(.13,.38,12),azure);cone.position.set(-1+i*.85,.34,-1.05);warning.add(cone);}}
@@ -83,6 +110,9 @@ function bench(){const root=group();ground(root);tree(root,-2.6,-1.4,.85);tree(r
  const access=group(root,2.28,0,.10);for(const x of [-.6,.6])box(access,.015,.008,1.55,x,.126,0,azure,.002);for(const z of [-.77,.77])box(access,1.2,.008,.015,0,.126,z,azure,.002);
  const stand=human(root,.90,1.05);stand.rotation.y=-.35;rod(stand,[.34,.9,.15],[.40,.15,.35],.027,crystal);sphere(stand,.036,.4,.15,.35,ink);
  const reference=group(root);const camden=camdenBench(reference);camden.position.z=-.18;const witness=glaze(human(reference,1.95,.83));witness.rotation.y=-.6;
+ // —— 细节（仅装饰）：长椅下的铺地、灯柱、垃圾桶与花箱。——
+ const pad=paving(root,1.5,4.5,0,-.18,.5);pad.rotation.y=Math.PI/2;lampPost(root,-3.0,-.55,1);planterBox(root,2.95,-1.75);
+ const bin=group(root,-2.95,.113,1.55);cyl(bin,.15,.42,0,.21,0,satin,.13);torus(bin,.152,.012,0,.42,0,azure);cyl(bin,.11,.012,0,.425,0,ink);cyl(bin,.14,.02,0,.01,0,brushed);
  const plate=sign(root,-2.05,.75);let v=0;return{root,focusPoint:new T.Vector3(0,.8,0),update(o,t,dt){g.visible=seated.visible=!o.reference;reference.visible=!!o.reference;v=T.MathUtils.damp(v,o.material??0,6,dt);const fit=Math.max(0,v-1);seat.scale.x=1-fit*.18;seat.position.x=-fit*.35;middle.forEach(a=>{a.scale.y=Math.max(.001,1-Math.min(v,1));a.visible=v<.98;});sides.forEach(a=>{a.scale.y=Math.max(.001,Math.min(v,1));a.visible=v>.02;});sides[1].position.x=1.8-fit*.70;wheel.visible=access.visible=(o.material===2)&&!o.reference;stand.visible=o.material!==2&&!o.reference;seated.rotation.y=0;}};
 }
 function solarCrown(p,x,y,z){
@@ -98,10 +128,14 @@ function power(){const root=group();ground(root);const throne=group(root,0,0,-.3
  glaze(human(throne,0,-.009,true,seatY));
  box(throne,.69,.12,.42,0,seatY-.435-.06,.30,chalk,.03);
  solarCrown(throne,0,seatY-.435+1.387,-.022);
- const panel=group(root,0,0,1.36);cyl(panel,.58,.13,0,.2,0,chalk);cyl(panel,.40,.08,0,.305,0,glass);const button=cyl(panel,.24,.09,0,.39,0,azure);torus(panel,.29,.012,0,.37,0,steel);
+ // —— 细节（仅装饰）：王座下的大理石地台与嵌线、两侧立柱、通向按钮台的步道。——
+ box(throne,2.3,.012,2.0,0,.119,.05,marble,.004).castShadow=false;for(const z of [-.93,1.03])box(throne,2.2,.004,.012,0,.127,z,azure,0).castShadow=false;for(const x of [-1.1,1.1])box(throne,.012,.004,1.96,x,.127,.05,azure,0).castShadow=false;
+ for(const x of [-1.42,1.42]){const c=group(throne,x,.113,-.78);box(c,.36,.1,.36,0,.05,0,satin,.02);cyl(c,.15,.06,0,.13,0,satin);cyl(c,.105,2.25,0,1.285,0,marble,.095);cyl(c,.15,.06,0,2.44,0,satin);box(c,.34,.08,.34,0,2.51,0,satin,.02);sphere(c,.1,0,2.65,0,porcelain);torus(c,.11,.008,0,.2,0,azure);}
+ paving(root,.7,.95,0,.72,.32);
+ const panel=group(root,0,0,1.36);cyl(panel,.66,.04,0,.133,0,satin);for(let i=0;i<12;i++){const a=i*Math.PI/6;box(panel,.012,.006,.07,Math.sin(a)*.5,.268,Math.cos(a)*.5,i%3?brushed:azure,0).rotation.y=a;}cyl(panel,.58,.13,0,.2,0,chalk);cyl(panel,.40,.08,0,.305,0,glass);const button=cyl(panel,.24,.09,0,.39,0,azure);torus(panel,.29,.012,0,.37,0,steel);
  const supporters=group(root);const lights=[];const positions=[[-2.25,-1.15],[-1.65,1.1],[1.65,-1.2]];positions.forEach(([x,z],i)=>{const h=human(supporters,x,z);h.rotation.y=Math.atan2(-x,-z);const m=mat(blue,.3);m.emissive.set(blue);const l=cyl(root,.21,.025,x,.15,z,m);lights.push(l);const link=path(root,[[x,.14,z],[x*.65,.14,z*.7],[0,.14,-.3]],blue);link.material=m;});
  const executor=human(root,2.35,.95);executor.rotation.y=-.9;const receive=box(root,.32,.04,.40,2.35,1.04,1.30,azure,.02);const route=path(root,[[0,.15,1.36],[1,.15,1.72],[2.35,.15,1.3]],blue);const pulse=sphere(root,.055,0,.23,1.36,azure);const halo=torus(root,.23,.013,0,.38,1.36,azure);
- const outcome=group(root,2.35,0,-.65);cyl(outcome,.34,.08,0,.18,0,chalk);const signal=box(outcome,.10,1.25,.10,0,.83,0,steel,.02),flag=box(outcome,.70,.42,.035,.32,1.35,0,azure,.02);label(outcome,'命令结果',0,.38,.12,.80,.15);
+ const outcome=group(root,2.35,0,-.65);cyl(outcome,.34,.08,0,.18,0,chalk);const signal=box(outcome,.10,1.25,.10,0,.83,0,steel,.02),flag=box(outcome,.70,.42,.035,.32,1.35,0,azure,.02);label(outcome,'命令结果',0,.38,.12,.80,.15);torus(outcome,.345,.01,0,.222,0,azure);cyl(outcome,.4,.03,0,.128,0,satin);const lectern=group(root,2.35,.113,1.3);cyl(lectern,.13,.03,0,.015,0,brushed);cyl(lectern,.022,.86,0,.45,0,brushed);box(lectern,.3,.02,.3,0,.885,0,satin,.008);
  const shared=group(root,0,0,.35);cyl(shared,.72,.12,0,.70,0,crystal);shared.visible=false;
  let press=0,performed=0;
  return{root,interactTargets:[button],focusPoint:new T.Vector3(0,1.1,0),update(o,t,dt){press=T.MathUtils.damp(press,t-(o.commandAt??-100)<.8?1:0,12,dt);button.position.y=.39-press*.035;lights.forEach(l=>{l.material.emissiveIntensity=o.support?.55:0;l.material.color.set(o.support?blue:'#bfc4cf');});supporters.children.forEach(h=>h.rotation.y=T.MathUtils.damp(h.rotation.y,o.support?Math.atan2(-h.position.x,-h.position.z):Math.PI,4,dt));route.material.color.set(o.execute?blue:'#bfc4cf');receive.rotation.x=T.MathUtils.damp(receive.rotation.x,o.execute?0:1.2,5,dt);const u=Math.min(1,(t-(o.commandAt??-100))/1.5);pulse.visible=u<1&&u>=0&&o.execute;if(pulse.visible)pulse.position.set(mix(0,2.35,u),.24+Math.sin(u*Math.PI)*.20,mix(1.36,1.3,u));halo.scale.setScalar(1+press*.20);
@@ -121,6 +155,14 @@ function weather(){
  const location=group(phone,0,.51,.24);torus(location,.10,.023,-.40,0,0,azure,0);box(location,.58,.025,.015,.12,0,0,azure,.008);
  const homes=group(root,-2.25,0,-.65);box(homes,.65,.67,.7,0,.47,0,chalk,.04);const roof=new T.Mesh(new T.ConeGeometry(.52,.38,4),chalk);roof.rotation.y=Math.PI/4;roof.position.y=.99;homes.add(roof);box(homes,.18,.30,.024,0,.35,.36,azure,.02);
  const tower=group(root,1.45,0,-.15);box(tower,.88,1.62,.72,0,.96,0,crystal,.07);box(tower,.88,.12,.72,0,.20,0,chalk,.045);box(tower,.88,.09,.72,0,1.81,0,chalk,.045);for(let i=0;i<4;i++)box(tower,.57,.06,.42,0,.49+i*.29,0,chalk,.02);label(tower,'商业用途',0,1.98,.37,.85,.18);
+ // —— 细节（仅装饰）：手机底座与页码点、住宅的窗与信箱、数据塔的基座、立柱与天线。——
+ box(phone,2.0,.07,.66,0,-.012,0,marble,.02);box(phone,1.9,.01,.012,0,-.02,.333,azure,0);for(let i=0;i<5;i++)sphere(phone,.022,-.16+i*.08,.7,.215,i===2?azure:steel,[1,1,.4]);
+ for(const x of [-.17,.17])box(homes,.15,.17,.02,x,.6,.357,crystal,.01);box(homes,.72,.05,.76,0,.135,0,satin,.015);box(homes,.14,.3,.14,.17,1.05,-.1,chalk,.02);box(homes,.5,.01,.012,0,.79,.358,azure,0);
+ const post=group(homes,.62,.113,.48);cyl(post,.018,.5,0,.25,0,brushed);box(post,.2,.12,.12,0,.55,0,porcelain,.03);box(post,.012,.1,.06,.108,.6,0,azure,.004);
+ box(tower,1.06,.06,.9,0,.143,0,marble,.02);for(const x of [-.445,.445])for(const z of [-.365,.365])box(tower,.03,1.56,.03,x,.99,z,brushed,.006);
+ for(let i=0;i<4;i++)for(let k=0;k<3;k++)sphere(tower,.014,-.2+k*.06,.535+i*.29,.215,azure);
+ rod(tower,[.2,1.855,-.1],[.2,2.5,-.1],.012,brushed);sphere(tower,.028,.2,2.52,-.1,azure);cyl(tower,.12,.03,-.18,1.9,.1,satin,.06);rod(tower,[-.18,1.86,.1],[-.18,1.9,.1],.014,brushed);box(tower,.5,.03,.24,0,.62,.47,satin,.01);
+ tree(root,2.75,-1.55,.6);planterBox(root,-2.9,1.5);
  const trace=path(root,[[-.45,.15,.6],[.4,.15,.77],[1.45,.15,.4]],blue),input=path(root,[[-2.25,.15,-.3],[-1.55,.15,.55],[-.45,.15,.6]],blue),dots=[];
  for(let i=0;i<5;i++)dots.push(sphere(root,.045,0,.2,0,azure));const switchButton=box(phone,.64,.09,.08,0,.36,.23,azure,.035);
  return{root,focusPoint:new T.Vector3(0,1.2,0),interactTargets:[switchButton],update(o,t){const active=o.precise&&o.commercial;trace.visible=active;input.material.color.set(o.precise?blue:'#bdc4cd');location.visible=o.precise;switchButton.material=active?azure:chalk;dots.forEach((d,i)=>{const u=(t*.20+i*.2)%1;d.visible=active;d.position.copy(trace.geometry.parameters.path.getPointAt(u));d.position.y=.22;});}};
@@ -139,6 +181,23 @@ function shopping(){
  const root=group();ground(root);const shopper=human(root,-1.55,.5);shopper.rotation.y=.40;
  const shop=group(root,-.6,0,-1.25);box(shop,2.1,.15,.75,0,1.45,0,chalk,.045);for(const x of [-.92,.92])box(shop,.075,1.32,.07,x,.80,0,steel,.02);box(shop,2.1,.15,.75,0,.35,0,chalk,.04);label(shop,'领取 / CHECK OUT',0,1.66,.05,1.65,.16);for(let i=0;i<3;i++)shoppingBag(shop,-.65+i*.65,.45,0,chalk,.38);
  const cabinet=group(root,1.65,0,-.5);for(const x of [-.46,.46])box(cabinet,.10,1.55,.85,x,.94,0,chalk,.035);for(const y of [.20,1.72])box(cabinet,1.02,.10,.85,0,y,0,chalk,.035);box(cabinet,.90,1.45,.07,0,.94,-.38,chalk,.025);box(cabinet,.9,1.28,.045,0,.99,.45,crystal,.05);const slot=box(cabinet,.58,.095,.04,0,1.56,.48,azure,.025);label(cabinet,'归还 / RETURN',0,1.95,.46,1.02,.17);for(let i=0;i<3;i++)box(cabinet,.68,.06,.48,0,.43+i*.22,.02,azure,.02);
+ // —— 细节（仅装饰，不参与交互状态）——
+ // 领取台：大理石台面、底座、挂杆、背板格栅、檐下灯带与扫码器。
+ box(shop,1.98,.2,.64,0,.172,0,satin,.03);box(shop,1.9,.05,.6,0,.085,0,brushed,.01);box(shop,2.14,.034,.79,0,.443,0,marble,.012);box(shop,2.14,.012,.012,0,.418,.397,azure,0);
+ box(shop,2.14,.05,.79,0,1.548,0,satin,.016);box(shop,2.0,.012,.012,0,1.398,.378,azure,0);box(shop,1.7,.018,.07,0,1.368,.2,lamp,.006).castShadow=false;
+ for(const x of [-.92,.92]){cyl(shop,.062,.03,x,.475,0,brushed);cyl(shop,.062,.03,x,1.36,0,brushed);}
+ box(shop,1.78,.86,.026,0,.92,-.335,satin,.008);for(let i=0;i<9;i++)box(shop,.012,.8,.012,-.8+i*.2,.92,-.317,brushed,0);
+ rod(shop,[-.86,1.135,0],[.86,1.135,0],.012,brushed);for(let i=0;i<3;i++){const x=-.65+i*.65;for(const dx of [-.127,.127])rod(shop,[x+dx,1.135,0],[x+dx,1.0,0],.005,brushed);}
+ cyl(shop,.028,.15,.33,.535,.29,brushed);box(shop,.11,.05,.075,.33,.63,.29,porcelain,.02);box(shop,.06,.006,.04,.33,.657,.29,azure,.002);
+ const mat0=box(root,1.7,.012,.52,-.6,.119,-.58,mat('#eef0f5',.95),.01);mat0.castShadow=false;for(const z of [-.36,-.8])box(root,1.6,.004,.01,-.6,.126,z,azure,0).castShadow=false;
+ // 归还柜：柜脚、檐口、散热格栅、门框与拉手、投入口面板与指示环。
+ for(const x of [-.42,.42])for(const z of [-.34,.34])cyl(cabinet,.04,.1,x,.1,z,brushed);box(cabinet,1.08,.04,.9,0,1.79,0,satin,.014);for(let i=0;i<5;i++)box(cabinet,.5,.01,.028,0,1.814,-.2+i*.08,brushed,0);
+ for(const x of [-.425,.425])box(cabinet,.03,1.3,.03,x,.99,.468,brushed,.006);for(const y of [.345,1.635])box(cabinet,.88,.03,.03,0,y,.468,brushed,.006);
+ rod(cabinet,[.34,.82,.515],[.34,1.16,.515],.013,brushed);for(const y of [.86,1.12])rod(cabinet,[.34,y,.47],[.34,y,.515],.008,brushed);
+ box(cabinet,.68,.16,.02,0,1.56,.462,satin,.02);torus(cabinet,.034,.007,.39,1.56,.482,azure,0);for(let i=0;i<3;i++)box(cabinet,.7,.014,.02,0,.468+i*.22,.262,brushed,0);
+ box(cabinet,.008,1.3,.012,.512,.94,.3,azure,0);box(cabinet,.008,1.3,.012,-.512,.94,.3,azure,0);
+ // 留下袋子的地方：地面上一圈浅灰的界线。
+ const lot=group(root,.35,.1146,1.15);for(const z of [-.5,.5])box(lot,1.72,.004,.01,0,0,z,brushed,0);for(const x of [-.86,.86])box(lot,.01,.004,1.0,x,0,0,brushed,0);lot.traverse(o=>{if(o.isMesh)o.castShadow=false;});
  const bag=shoppingBag(root,-.5,.45,-1.15,crystal,.72);const band=box(bag,.61,.075,.025,0,.48,.19,azure,.012);const goods=group(bag);box(goods,.28,.43,.14,.12,.7,0,chalk,.025);cyl(goods,.11,.48,-.16,.73,0,chalk);
  const waste=group(root,.35,0,1.15),discarded=[];for(let i=0;i<6;i++){const item=shoppingBag(waste,(i%3-1)*.5,.19+Math.floor(i/3)*.14,(Math.floor(i/3)-.5)*.38,chalk,.43);item.rotation.x=-1.25;item.rotation.z=(i-2)*.2;discarded.push(item);}
  const wasteLabel=label(root,'留下的袋子',.35,.40,1.85,1.4,.18,'#6e7684');const loop=path(root,[[-1.2,.14,.5],[-.6,.14,1.1],[1.6,.14,1.0],[1.65,.14,-.4],[.2,.14,-.7],[-1.2,.14,.5]],blue);const keeper=human(root,2.55,.8);keeper.rotation.y=-1;keeper.visible=false;
@@ -149,7 +208,13 @@ function toolExhibit(){
  const panels=[];for(const side of [-1,1]){const pivot=group(display,side*1.82,0,-.53);box(pivot,1.82,1.7,.055,-side*.91,1.22,0,crystal,.02);box(pivot,.025,1.7,.025,0,1.22,0,steel,.005);panels.push(pivot);}
  for(const x of [-1.8,1.8])box(display,.055,1.7,1.08,x,1.22,0,crystal,.02);
  const shape=new T.Shape();const outline=[[-1.64,.16],[-1.64,.58],[-.85,.41],[-.59,.45],[-.59,.60],[.18,.60],[.18,.45],[.93,.42],[.93,.34],[1.68,.34],[1.68,.23],[.93,.23],[.93,.15],[.21,.13],[.10,-.36],[-.17,-.40],[-.24,.12],[-.42,.10],[-.52,-.30],[-.72,-.22],[-.62,.18],[-.89,.16]];outline.forEach(([x,y],i)=>i?shape.lineTo(x,y):shape.moveTo(x,y));shape.closePath();const geo=new T.ExtrudeGeometry(shape,{depth:.17,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.015,bevelThickness:.015});geo.translate(0,0,-.085);const silhouette=new T.Mesh(geo,chalk);silhouette.position.set(0,1.06,.04);silhouette.castShadow=true;display.add(silhouette);
- const stands=group(display);for(const x of [-1.0,.8]){cyl(stands,.025,.64,x,.64,.03,steel);box(stands,.19,.05,.19,x,.35,.03,azure,.015);}label(display,'工具 / 目的 / 后果',0,.26,.66,2.1,.22);
+ const stands=group(display);for(const x of [-1.0,.8]){cyl(stands,.025,.64,x,.64,.03,steel);box(stands,.19,.05,.19,x,.35,.03,azure,.015);cyl(stands,.042,.02,x,.386,.03,brushed);box(stands,.07,.028,.2,x,.957,.03,brushed,.008);}
+ // —— 细节（仅装饰）：展柜底座、台面、柜框、轨道射灯、说明牌与温湿度计。——
+ box(display,4.07,.15,1.49,0,.085,0,satin,.04);box(display,3.7,.018,1.1,0,.366,0,marble,.006);box(display,3.6,.01,.012,0,.33,.638,azure,0);box(display,3.6,.01,.012,0,.33,-.638,azure,0);
+ for(const x of [-1.8,1.8]){box(display,.075,.034,1.14,x,2.087,0,brushed,.01);rod(display,[x,.36,.54],[x,2.07,.54],.013,brushed);rod(display,[x,2.1,0],[x,2.32,0],.012,brushed);}
+ box(display,3.66,.028,.05,0,2.32,0,brushed,.008);for(const x of [-1.05,0,1.05]){cyl(display,.05,.07,x,2.27,0,satin,.036);glowLamp(display,x,2.2,0,.055,false);}
+ const plaque=group(display,1.5,0,.98);rod(plaque,[0,.11,0],[0,.74,0],.016,brushed);cyl(plaque,.11,.02,0,.125,0,brushed);const plate=box(plaque,.52,.02,.32,0,.76,.02,marble,.008);plate.rotation.x=.5;const rule=box(plaque,.4,.006,.012,0,.80,.075,azure,0);rule.rotation.x=.5;
+ box(display,.16,.1,.09,-1.55,.425,-.4,porcelain,.02);cyl(display,.022,.006,-1.55,.43,-.352,azure).rotation.x=Math.PI/2;label(display,'工具 / 目的 / 后果',0,.26,.66,2.1,.22);
  const people=group(root),persons=[];for(const [x,z,a] of [[-2.2,.9,.65],[2.15,.9,-.85],[.45,1.8,Math.PI]]){const h=human(people,x,z);h.rotation.y=a;persons.push(h);}glaze(persons[2]);const interrupted=group(root);for(const x of [-1.15,1.15]){path(interrupted,[[x,.14,1.7],[x,.14,.55]],blue);box(interrupted,.44,.018,.07,x,.145,.5,azure,.015);}const forum=group(root,0,0,1.5);cyl(forum,.42,.1,0,.63,0,crystal);forum.visible=false;let reveal=0,removal=0;
  return{root,focusPoint:new T.Vector3(0,1.05,0),update(o,t,dt){reveal=T.MathUtils.damp(reveal,o.stage>0?1:0,4,dt);removal=T.MathUtils.damp(removal,o.stage===2?1:0,4,dt);panels.forEach((p,i)=>{p.rotation.y=(i?1:-1)*reveal*1.12;p.position.x=(i?1:-1)*(1.82+reveal*.48);});forum.visible=!!o.convene;people.visible=reveal>.03;persons.forEach((p,i)=>{p.position.y=-(1-reveal)*1.9;p.rotation.y=[.65,-.85,Math.PI][i]+removal*(i===2?.6:0);p.position.x=T.MathUtils.damp(p.position.x,o.convene?[-.9,.9,0][i]:[-2.2,2.15,.45][i],4,dt);p.position.z=T.MathUtils.damp(p.position.z,o.convene?[1.3,1.3,2.25][i]:[.9,.9,1.8][i],4,dt);});interrupted.visible=reveal>.3;silhouette.position.y=1.06-removal*1.35;silhouette.scale.setScalar(Math.max(.001,1-removal));silhouette.visible=removal<.99;stands.scale.y=Math.max(.001,1-removal);}};
 }
@@ -172,18 +237,39 @@ function shoppingStreet(){
  const root=group();const districts=[],exchangeItems=[],goods=[],audience=[],tags=[];let journey=0,exchange=0,paid=0,prestige=1;
  function building(p,x,z,w,h,d,style){const g=group(p,x,0,z);if(style>0){box(g,w,h,.09,0,.12+h/2,-d/2,chalk,.025);for(const side of [-1,1])box(g,.12,h,d,side*(w-.12)/2,.12+h/2,0,chalk,.025);box(g,w,.12,d,0,.18,0,chalk,.025);}else box(g,w,h,d,0,.12+h/2,0,chalk,.045);box(g,w+.12,.12,d+.12,0,h+.18,0,chalk,.025);if(style>0){box(g,w-.23,h-.52,.065,0,.24+(h-.52)/2,d/2+.035,crystal,.02);for(const sx of [-1,1])box(g,.06,h-.35,.08,sx*(w/2-.12),.27+(h-.35)/2,d/2+.08,steel,.01);}return g;}
  function goodsShape(p,x,z,type=0){const g=group(p,x,0,z);if(type===0){sphere(g,.17,0,.17,0,chalk,[1.2,.75,.85]);for(let i=0;i<3;i++)rod(g,[-.1+i*.07,.275,-.05],[-.1+i*.07,.275,.08],.007,wood);}else{cyl(g,.12,.22,0,.13,0,chalk);torus(g,.085,.02,.11,.16,0,steel,0);}return g;}
+ // —— 细节（仅装饰）：三个时代共用的街灯、护柱与花箱。——
+ function streetLamp(p,x,z,face=1){const g=group(p,x,.175,z);cyl(g,.07,.05,0,.025,0,brushed);cyl(g,.026,1.85,0,.95,0,satin,.02);rod(g,[0,1.86,0],[face*.34,1.92,0],.014,brushed);cyl(g,.05,.03,face*.34,1.925,0,brushed);glowLamp(g,face*.34,1.82,0,.105);return g;}
+ function bollard(p,x,z){const g=group(p,x,.175,z);cyl(g,.05,.36,0,.18,0,satin,.045);sphere(g,.05,0,.37,0,porcelain);cyl(g,.052,.014,0,.27,0,azure);return g;}
+ function planter(p,x,z){const g=group(p,x,.175,z);box(g,.5,.3,.5,0,.15,0,satin,.04);box(g,.44,.02,.44,0,.3,0,joint,.01);for(const [dx,dz,r] of [[-.08,.03,.2],[.1,-.06,.17],[.02,.12,.14]])sphere(g,r,dx,.42+r*.5,dz,chalk);box(g,.5,.012,.012,0,.24,.252,azure,0);return g;}
  for(let era=0;era<3;era++){
   const district=group(root);districts.push(district);ground(district);for(const x of [-1.9,1.9])box(district,1.1,.07,3.9,x,.14,0,chalk,.03);for(let j=0;j<6;j++)box(district,.035,.01,.28,0,.125,-1.8+j*.65,era===2?azure:wood,.005);
+  streetLamp(district,-1.6,1.55,1);streetLamp(district,1.6,-1.75,-1);for(const z of [1.45,1.95])bollard(district,1.5,z);planter(district,-2.05,1.0);for(const x of [-1.9,1.9])for(let j=0;j<4;j++)box(district,1.04,.004,.008,x,.177,-1.5+j,joint,0).castShadow=false;
   if(era===0){
    const stall=group(district,0,0,-.65);for(const x of [-1.65,1.65]){cyl(stall,.055,1.8,x,1.05,0,wood);cyl(stall,.055,1.8,x,1.05,-.65,wood);}box(stall,3.6,.07,1.15,0,2.04,-.32,chalk,.03).rotation.z=-.035;box(stall,3.3,.14,.85,0,.72,-.27,chalk,.035);box(stall,3.0,.54,.60,0,.40,-.27,wood,.035);label(stall,'交换集市',0,1.80,.28,1.20,.2,'#6f7885');
    for(const side of [-1,1]){const h=human(district,side*1.25,.60);h.rotation.y=side*-1.1;const item=group(district,side*.85,.81,.20);if(side<0){for(let i=0;i<5;i++)sphere(item,.10,(i%3)*.13-.13,0,Math.floor(i/3)*.11,chalk,[1,.7,1]);}else{box(item,.40,.10,.35,0,0,0,crystal,.025);box(item,.34,.06,.32,0,.085,0,chalk,.02);}exchangeItems.push(item);}
    const sideStall=group(district,2.55,0,-.72);box(sideStall,.7,.56,1.25,0,.40,0,chalk,.035);box(sideStall,.76,.08,1.30,0,.72,0,wood,.02);for(let j=0;j<3;j++)cyl(sideStall,.12,.24,0,.87,-.40+j*.4,chalk);const scale=group(stall,0,.8,-.3);cyl(scale,.035,.62,0,.3,0,steel);rod(scale,[-.48,.57,0],[.48,.57,0],.025,steel);for(const x of [-.43,.43]){rod(scale,[x,.57,0],[x,.22,0],.009,steel);sphere(scale,.23,x,.20,0,crystal,[1,.17,1]);}tree(district,-2.7,-1.3,.6);
+   // 集市摊位：檐口流苏与蓝色镶边、柱间斜撑、吊灯、陶罐与木箱。
+   for(let i=0;i<13;i++)box(stall,.24,i%2?.13:.09,.018,-1.5+i*.25,1.955-(i%2?.02:0),.262,i%2?chalk:satin,.008);box(stall,3.6,.014,.014,0,2.012,.268,azure,0);
+   for(const x of [-1.65,1.65]){rod(stall,[x,1.15,-.65],[x,1.7,0],.014,wood);rod(stall,[x,1.15,0],[x,1.7,-.65],.014,wood);}
+   for(const x of [-.9,.9]){rod(stall,[x,2.0,-.1],[x,1.72,-.1],.006,steel);glowLamp(stall,x,1.64,-.1,.085);cyl(stall,.05,.03,x,1.735,-.1,brushed);}
+   for(const [x,r,h] of [[-1.35,.085,.2],[-1.13,.065,.26],[1.2,.09,.16],[1.42,.06,.22]]){cyl(stall,r,h,x,.79+h/2,-.5,porcelain,r*.7);torus(stall,r*.72,.008,x,.79+h,-.5,azure,Math.PI/2);}
+   for(const [x,y] of [[-2.25,.3],[-2.25,.62],[-2.72,.3]]){const c=box(stall,.44,.3,.4,x,y-.03,-.15,wood,.02);for(const dy of [-.08,.06])box(stall,.45,.02,.41,x,y-.03+dy,-.15,chalk,.004);}
   }else if(era===1){
    const store=building(district,0,-1.14,3.5,2.0,.85,1);box(store,3.7,.09,1.40,0,1.83,.65,chalk,.03).rotation.x=.12;for(let j=0;j<7;j++)box(store,.30,.015,.65,-1.50+j*.5,1.91,.85,j%2?chalk:wood,.01).rotation.x=.12;label(store,'DAILY / 日常所需',0,2.24,.47,2.25,.20);box(store,2.85,.15,.65,0,.72,.75,chalk,.035);
    const neighbor=building(district,2.65,-.65,.74,1.25,1.25,1);label(neighbor,'日用',0,1.48,.68,.5,.13);goods.push(goodsShape(district,-.50,-.32,0),goodsShape(district,.50,-.32,1));goods.forEach(g=>g.position.y=.8);const h=human(district,-1.35,1.0);h.rotation.y=.6;const bag=shoppingBag(district,-.45,.2,1.0,crystal,.72);goods.push(bag);
+   // 日用店：店内层架与陈列、门楣灯、门把手、遮阳棚蓝边。
+   for(const y of [.98,1.42]){box(store,2.9,.028,.34,0,y,-.2,satin,.008);for(let i=0;i<7;i++){const x=-1.2+i*.4;if(i%2)box(store,.16,.2,.12,x,y+.114,-.2,porcelain,.02);else cyl(store,.065,.2,x,y+.114,-.2,chalk,.05);}}
+   box(store,3.7,.014,.014,0,1.745,1.34,azure,0);for(const x of [-1.1,0,1.1]){cyl(store,.04,.05,x,2.07,.5,brushed);glowLamp(store,x,2.0,.5,.05,false);}
+   rod(store,[1.42,.86,.5],[1.42,1.2,.5],.012,brushed);box(store,2.85,.012,.012,0,.79,1.08,azure,0);box(neighbor,.5,.012,.012,0,1.36,.7,azure,0);
   }else{
    const flagship=building(district,-.40,-.85,3.05,2.62,1.20,1);box(flagship,3.20,.12,1.4,0,2.55,.08,steel,.025);label(flagship,'MAISON / 身份橱窗',0,2.85,.65,2.6,.20);box(flagship,1.1,.65,.82,0,.47,.37,chalk,.035);const luxury=displayHandbag(flagship,0,.83,.37);
    const tower=building(district,2.12,-.95,.91,2.05,.9,1);label(tower,'LIMITED',0,2.25,.5,.85,.14);const tag=label(flagship,'限量 / EXCLUSIVE',0,2.13,.71,1.8,.18,'#343e50');tags.push(tag);const halo=torus(flagship,.56,.014,0,1.45,.35,azure,0);tags.push(halo);
+   // 旗舰店：背墙竖肋、顶部射灯、大理石展台；隔离绳与地面嵌线随「限量」标签一同出现。
+   for(let i=0;i<8;i++)box(flagship,.03,2.2,.07,-1.26+i*.36,1.4,-.53,satin,.008);for(const x of [-.7,0,.7]){cyl(flagship,.045,.06,x,2.455,.37,satin,.034);glowLamp(flagship,x,2.39,.37,.05,false);}
+   box(flagship,1.16,.022,.88,0,.806,.37,marble,.008);box(flagship,1.1,.01,.012,0,.62,.786,azure,0);box(flagship,3.2,.012,.012,0,2.49,.782,azure,0);
+   const cordon=group(district,-.4,0,.3);for(const x of [-.95,.95]){cyl(cordon,.085,.02,x,.135,0,brushed);cyl(cordon,.022,.6,x,.44,0,brushed);sphere(cordon,.04,x,.76,0,porcelain);}
+   const sag=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([new T.Vector3(-.95,.7,0),new T.Vector3(-.45,.6,0),new T.Vector3(0,.57,0),new T.Vector3(.45,.6,0),new T.Vector3(.95,.7,0)]),24,.016,8,false),azure);sag.castShadow=true;cordon.add(sag);
+   for(const x of [-.5,.5])box(cordon,.01,.004,1.3,x,.127,.75,azure,0).castShadow=false;tags.push(cordon);
    for(const [x,z] of [[-1.7,.85],[.35,1.35],[1.95,.85]]){const h=human(district,x,z);h.rotation.y=Math.atan2(-.4-x,-.85-z);audience.push(h);const line=path(district,[[x,.14,z],[x*.65-.1,.14,.20],[-.4,.14,-.45]],blue);tags.push(line);}glaze(audience[1]);
   }
  }
@@ -215,6 +301,9 @@ function chamber(){
  box(root,6.3,.14,.48,0,2.98,-1.65,chalk,.03);for(const y of [.36,2.6])box(root,5.8,.025,.03,0,y,-1.75,detail,.006);
  for(const x of [-1.9,1.9]){box(root,.86,1.45,.035,x,1.52,-1.74,crystal,.07);box(root,.96,.05,.10,x,2.28,-1.72,chalk,.01);}
  const sofa=group(root,-1.25,0,-.1);sofa.name='Private_Couch';const couch=placeAsset(sofa,'KLINE',0,.19,0);if(!couch){box(sofa,1.6,.30,.85,0,.53,0,stone,.09);box(sofa,1.65,.65,.17,0,.98,-.38,chalk,.06);for(const x of [-.82,.82])box(sofa,.16,.48,.90,x,.69,0,chalk,.05);}glaze(human(sofa,0,.05,true,couch ? .721 : .68));
+ // —— 细节（仅装饰）：地毯与蓝边、墙面嵌线、柜顶的花瓶。——
+ const rug=box(root,3.3,.012,2.0,-.8,.196,.45,mat('#eef0f5',.96),.02);rug.castShadow=false;for(const z of [-.45,1.35])box(root,3.1,.004,.012,-.8,.204,z,azure,0).castShadow=false;for(const x of [-2.35,.75])box(root,.012,.004,1.8,x,.204,.45,azure,0).castShadow=false;
+ box(root,5.8,.012,.02,0,1.05,-1.76,azure,0);cyl(root,.07,.22,2.5,1.67,-.6,porcelain,.045);sphere(root,.085,2.5,1.62,-.6,porcelain);torus(root,.048,.007,2.5,1.78,-.6,azure);
  const table=group(root,-.2,0,.85);cyl(table,.57,.10,0,.72,0,crystal);cyl(table,.08,.55,0,.42,0,detail);cyl(table,.30,.08,0,.19,0,chalk);
  const attendant=human(root,1.35,.30);attendant.rotation.y=-1.2;for(const side of ['NEG','POS']){const elbow=attendant.getObjectByName('ELBOW_'+side);if(elbow)elbow.rotation.x=-1.28;}const tray=group(attendant,0,1.16,.27);cyl(tray,.29,.025,0,0,0,detail);cyl(tray,.08,.13,0,.08,0,chalk);torus(tray,.05,.012,.075,.10,0,detail,0);
  const cupboard=group(root,2.5,0,-.6);box(cupboard,.72,1.4,.55,0,.86,0,chalk,.035);for(let i=0;i<3;i++){box(cupboard,.65,.028,.50,0,.40+i*.4,.03,detail,.01);box(cupboard,.64,.30,.035,0,.59+i*.4,.29,crystal,.025);}

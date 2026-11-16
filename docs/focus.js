@@ -84,7 +84,7 @@ export class FocusLens {
     const projected=point.clone().project(camera);
     this.uniforms.uFocus.value.set((projected.x+1)/2,(projected.y+1)/2);
     this.uniforms.uRadius.value=inspection?.26:.21;
-    this.uniforms.uBlur.value=6*this.renderer.getPixelRatio()*blurAmount;
+    this.uniforms.uBlur.value=4.6*this.renderer.getPixelRatio()*blurAmount;
     const ink=this.silhouette?outlineAmount:0;
     this.uniforms.uStroke.value.set(1.75*this.renderer.getPixelRatio(),ink*.78);
     if(ink>0)this.drawSilhouette(scene,camera);
